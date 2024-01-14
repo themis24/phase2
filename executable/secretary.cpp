@@ -1,13 +1,13 @@
 #include <iostream>
 #include <string>
 #include <cstring>
-#include <list>
 #include <vector>
+#include <list>
 using namespace std;
 
 int valid_id(string id){
     if (id.length() != 10){                                     // Check the length
-        cout << "Error: University ID is too long." << endl;
+        cout << "Error: University ID is invalid." << endl;
         return 0;                                               //return as non valid
     }
     if (id.substr(0, 3) != "sdi"){                              //check if the first 3 characters are sdi with substring func from 0 to 3
@@ -29,22 +29,27 @@ int valid_id(string id){
 class Person{
     private:                                                        //the characteristics that students and professors have in common
         string name;
-        int age;
-        long long int tel_num;
-        string email;
-        long long int uni_id;
+        int uni_id;
         static int count;
         string occupation;
 
     public:                                                         //first constructor we use initialiaser list if were given veriables for the person
-        Person(const string& n, int years, long int num, const string& mail, long int id, string oc)
-            : name(n), age(years), tel_num(num), email(mail), uni_id(id), occupation(oc){
+        string Get_pname(){
+            return name;
+        }
+        int Get_pid(){
+            return uni_id;
+        }
+        string Get_poccupation(){
+            return occupation;
+        }
+        Person(const string& n, long int id, string oc)
+            : name(n), uni_id(id), occupation(oc){
             count++;                                                //we increase the sum by one
             cout << "Created a new Person. In total: " << count << endl;
         }
         Person(const Person& copied)                                //copy constructor
-        : name(copied.name), age(copied.age), tel_num(copied.tel_num), email(copied.email),
-        uni_id(copied.uni_id), occupation(copied.occupation){      //copy from the original from intialiser list
+        : name(copied.name), uni_id(copied.uni_id), occupation(copied.occupation){      //copy from the original from intialiser list
             count++;                                                //increase the sum
             cout << "Created a new Person. In total: " << count << endl;
         }
@@ -63,12 +68,6 @@ class Person{
             cout << "Enter name: " << endl;                         //get inputs
             in >> person.name;                                      //put them in the respective variables
             cout << "Enter age: " << endl;
-            in >> person.age;
-            cout << "Enter telephone number: " << endl;
-            in >> person.tel_num;
-            cout << "Enter e-mail: " << endl;
-            in >> person.email;
-            cout << "Enter university identification number: " << endl;
             in >> person.uni_id;
             cout << "Enter occupation" << endl;
             in >> person.occupation;
@@ -76,9 +75,6 @@ class Person{
         }
         friend ostream& operator<<(ostream& out, const Person& person){
             out << "Person's name: " << person.name << endl;    //overload the out<< operator and just print everything about a person
-            out << person.name << "'s age: " << person.age << endl;
-            out << person.name << "'s telephone number: " << person.tel_num << endl;
-            out << person.name << "'s e-mail: " << person.email << endl;
             out << person.name << "'s university identification number: sdi" << person.uni_id << endl;
             out << person.name <<"'s occupation: " << person.occupation << endl;
             return out;
@@ -87,92 +83,19 @@ class Person{
 
 int Person::count = 0;                                      //initialise the count
 
-class Secretary{
-    private:                                                    //each secretary has a name and knows every person
-        vector<Person*> people;                                 //we load the data into a vector of pointer person
-        string name;
-    public:
-        Secretary(string n):name(n){                            //constructor and destructor (2.1)
-            cout << "Constructed the secretary." << endl;
-        }
-        ~Secretary(){
-            for(int i = 0; i < people.size(); i++){             //dont forget to delete every person inside the vector
-                delete people[i];
-            }
-            cout << "Destructed the secretary." << endl;
-        }
-        Secretary& operator+(Person person){                    //overload the += operator to add a person with dynamic memory allocation (2.2)
-            Person* temp = new Person(person);                  //make a temp of the values you need and got via the main or function call
-            people.push_back(temp);                             //put the temp inside the vector
-            return *this;
-        }
-        bool search(Person target){                             //search for any person based on their university id (2.4)
-            for(int i = 0; i < people.size(); i++){
-                if(target.Get_id() == people[i]->Get_id()){     //if the ids match you found them
-                    return true;
-                }
-            }
-            return false;                                       //if they dont then you didnt
-        }
-        int search_id(int id){                                  //search for any person based on their university id but with only their sdi as input
-            for(int i = 0; i < people.size(); i++){             //instead of working with strings i just
-                if(id == people[i]->Get_id()){                  //if the ids match you found them
-                    return i;
-                }
-            }
-            return 0;
-        }                                                       //overload the in>> operator and take a name from keyboard and insert it into the secretary
-        friend istream& operator>>(istream& in, Secretary& sec){
-            cout<<"Give name."<<endl;                           //(2.3.a)
-            in>>sec.name;
-            return in;
-        }                                                       //overload the out<< operator and print every person in the vector of the secretary
-        friend ostream& operator<<(ostream& out, const Secretary& Sec){
-            out<<Sec.name<<"\n";                                //(2.3.b)
-            for(int i = 0; i < Sec.people.size(); i++){
-                out<<*(Sec.people[i]);
-            }
-            return out;
-        }
-        Secretary(const Secretary& copied)                      //copy constructor (2.5)
-        : name(copied.name)
-        {
-            for (int i = 0; i < copied.people.size(); i++){     //deep copy
-                Person* temp = new Person(*(copied.people[i])); //copy every person from the original vector to the new one
-                people.push_back(temp);
-            }
-            cout << "Created a copied Secretary."<< endl;
-        }
-};
-
 class Professor: public Person{
     private:
-        int years_active;
         string password;
     public:
-        int Get_years(){
-            return years_active;
-        }
         string Get_password(){
             return password;
         }
-        void Set_years(int x){
-            if(x >= 0){
-                years_active = x;
-            }
-            else{
-                cout << "Cant have less than 0 years of being active." << endl;
-            }
-        }
-
-        Professor(const string& n, int years, long int num, const string& mail, long int id, string oc,
-                int profYear, const string& newpass)
-            : Person(n, years, num, mail, id, oc),                                      //call base class constructor
-            years_active(profYear), password(newpass){
+        Professor(const string& n, long int num, long int id, string oc, const string& newpass)
+            : Person(n, id, oc), password(newpass){                                      //call base class constructor
             cout << "Created a new Professor." << endl;
         }
         Professor(const Professor& copied)
-            : Person(copied), years_active(copied.years_active), password(copied.password) {
+            : Person(copied), password(copied.password) {
             cout << "Created a new Professor by copying." << endl;
         }
         Professor(){
@@ -230,49 +153,145 @@ class Course{
 };
 
 class Student: public Person{
-private:
-    int year;
-    int average;
-    string password;
-    int points;
-public:
-    int Get_year(){
-        return year;
-    }
-    float Get_average(){
-        return average;
-    }
-    string Get_password(){
-        return password;
-    }
-    int Get_points(){
-        return points;
-    }
-    void Set_year(int x){
-        year = x;
-    }
-    void Set_average(float x){
-        average = x;
-    }
-    void Set_password(const string& newpass){
-        password = newpass;
-    }
-    void Set_points(int x){
-        points = x;
-    }
-    //dont forget to write an instruction thing for this cause its long
-    Student(const string& n, int years, long int num, const string& mail, long int id, string oc,
-            int studentYear, int studentAverage, const string& studentPassword, int studentPoints)
-        : Person(n, years, num, mail, id, oc),                                      //call base class constructor
-          year(studentYear), average(studentAverage), password(studentPassword), points(studentPoints) {
-        cout << "Created a new Student." << endl;
-    }
-    Student() : year(0), average(0), points(0) {
-        cout << "Created a new Student" << endl;
-    }
-    ~Student(){
-        cout<< "Deleted student" << endl;
-    }
+    private:
+        int year;
+        int average = 0;
+        string password;
+        int points = 0; 
+        list<Course> current_semester;
+    public:
+        string Get_name(){
+            return Get_pname();
+        }
+        int Get_id(){
+            return Get_pid();
+        }
+        string Get_occupation(){
+            return Get_poccupation();
+        }
+        int Get_year(){
+            return year;
+        }
+        float Get_average(){
+            return average;
+        }
+        string Get_password(){
+            return password;
+        }
+        int Get_points(){
+            return points;
+        }
+        void Set_year(int x){
+            year = x;
+        }
+        void Set_average(float x){
+            average = x;
+        }
+        void Set_password(const string& newpass){
+            password = newpass;
+        }
+        void Set_points(int x){
+            points = x;
+        }
+        //dont forget to write an instruction thing for this cause its long
+        Student(const string& n, string& id, string& oc, int studentYear, int studentAverage, const string& studentPassword, int studentPoints)
+            : Person(n, valid_id(id), oc),                                      //call base class constructor
+            year(studentYear), average(studentAverage), password(studentPassword), points(studentPoints) {
+            cout << "Created a new Student." << endl;
+        }
+        Student() : year(0), average(0), points(0) {
+            cout << "Created a new Student" << endl;
+        }
+        ~Student(){
+            cout<< "Deleted student" << endl;
+        }
+};
+
+class Secretary{
+    private:                                                    //each secretary has a name and knows every person
+        vector<Person*> people;                                 //we load the data into a list of pointer person
+        string name;
+         vector<Student*> students;
+    public:
+        Student Get_stud(int i){
+            return *students[i];
+        }
+        Secretary(string n):name(n){                            //constructor and destructor (2.1)
+            cout << "Constructed the secretary." << endl;
+        }
+        ~Secretary(){
+            for(int i = 0; i < people.size(); i++){             //dont forget to delete every person inside the list
+                delete people[i];
+            }
+            for(int i = 0; i < students.size(); i++){             //dont forget to delete every person inside the list
+                delete students[i];
+            }
+            cout << "Destructed the secretary." << endl;
+        }
+        Secretary& operator+(Person& person){                    //overload the += operator to add a person with dynamic memory allocation (2.2)
+            Person* temp = new Person(person);                               //make a temp of the values you need and got via the main or function call
+            people.push_back(temp);                            //put the person inside the vector
+            cout<<people.size()<<endl;
+            return *this;
+        }
+        Secretary& operator+(Student& stud){                    //overload the += operator to add a person with dynamic memory allocation (2.2)
+            Student* temp = new Student(stud);                               //make a temp of the values you need and got via the main or function call
+            students.push_back(temp);                            //put the person inside the vector
+            cout<<"stud:"<<students.size()<<endl;
+            return *this;
+        }
+        bool search(Student target){                             //search for any person based on their university id (2.4)
+            for(int i = 0; i < students.size(); i++){
+                if(target.Get_id() == students[i]->Get_id()){     //if the ids match you found them
+                    return true;
+                }
+            }
+            return false;                                       //if they dont then you didnt
+        }
+        int search_id(int id, string stud_or_teacher){              //search for any person based on their university id but with only their sdi as input
+            for(int i = 0; i < people.size(); i++){             //instead of working with strings i just
+                if(id == people[i]->Get_id()){                  //if the ids match you found them
+                    //if(stud_or_teacher == people[i]->occupation){
+                        return id;
+                    //}
+                }
+            }
+            return 0;
+        }
+        int search_id_stud(int id, string stud_or_teacher){              //search for any person based on their university id but with only their sdi as input
+            for(int i = 0; i < students.size(); i++){             //instead of working with strings i just
+                Student *temp = students[i];
+                cout<<temp->Get_id()<<endl;
+                int c = temp->Get_id();
+                if(id == c){                  //if the ids match you found them
+                    //if(stud_or_teacher == people[i]->occupation){
+                        return id;
+                    //}
+                }
+            }
+            return -1;
+        }                                                    //overload the in>> operator and take a name from keyboard and insert it into the secretary
+        friend istream& operator>>(istream& in, Secretary& sec){
+            cout<<"Give name."<<endl;                           //(2.3.a)
+            in>>sec.name;
+            return in;
+        }                                                       //overload the out<< operator and print every person in the list of the secretary
+        friend ostream& operator<<(ostream& out, const Secretary& Sec){
+            out<<Sec.name<<"\n";                                //(2.3.b)
+            for(int i = 0; i < Sec.people.size(); i++){
+                out<<*(Sec.people[i]);
+            }
+            return out;
+        }
+        Secretary(const Secretary& copied)                      //copy constructor (2.5)
+        : name(copied.name)
+        {
+            for (int i = 0; i < copied.people.size(); i++){     //deep copy
+                Person* temp = new Person(*(copied.people[i])); //copy every person from the original list to the new one
+                people.push_back(temp);
+            }
+            cout << "Created a copied Secretary."<< endl;
+        }
 };
 
 void stud(){
@@ -280,21 +299,64 @@ void stud(){
     cout << "Please provide your University ID." << endl;
     cin >> input;
     int id = valid_id(input);
+    cout<<id<<endl;
     if(id == 0){
         cout << "You have entered a non valid University. Proper syntax is:\nsdi1234567 (sdi followed by 7 numbers)" << endl;
         return;
     }
     Secretary secretary("temp");
-    int stud_number =secretary.search_id(id);
-    if(stud_number == 0){
+    string n = "student";
+    int s = 0;
+    s = secretary.search_id_stud(id, n);
+    if(s != -1){
         cout << "The University ID you have entered doesnt exist." << endl;
     }
+    cout << "Enter password." << endl;
+    string pass;
+    cin >> pass;
+    /*if(pass == student.password){
+        cout << "Login successful." << endl;
+        cout << "Press 1 to show your grades for this semester."<<endl<<"Press 2 to show total average."<<endl<<"Press 3 to show your ECTS points."<<endl<<"Press 4 to sign up for a course."<<endl<<"Press 5 to logout." << endl;
+        int choice;
+        cin >> choice;
+        while(choice != 5){
+            /*if(choice == 1){
+                cout << "Press 1 if its winter semester or 2 for spring semester." << endl;
+                int c;
+                cin >> c;
+                int s = 2*student.Get_year();
+                if(c == 1){
+                    s = s - 1;
+                    for(auto it = cursemester[s].begin(); it != semester[s].end(); it++){
 
+                    }
+                }
+                else_if(c == 2){
+                    for(auto it = semester[s].begin(); it != semester[s].end(); it++)
+
+                }
+            }
+            if(choice == 2){
+                float av = student.Get_average();
+                cout << av <<endl;
+            }
+            else if(choice == 3){
+                int epoints = student.Get_points();
+                cout << epoints << endl;
+            }
+            else if(choice == 4){
+
+            }
+            cout << "Press 1 to show your grades for this semester."<<endl<<"Press 2 to show total average."<<endl<<"Press 3 to show your ECTS points."<<endl<<"Press 4 to sign up for a course."<<endl<<"Press 5 to logout." << endl;
+            cin >> choice;
+        }
+    }*/
 }
 
 int main(){
-    //was intially vector but too much work to move around courses so we make it a list
-    list<Course> semester[8];                               //just to be simpler im gonna initialise the semesters with only 2 courses in each
+    //was intially list but too much work to move around courses so we make it a list
+    static list<Course> semester[8];                               //just to be simpler im gonna initialise the semesters with only 2 courses in each
+    static Secretary secretary("Bob"); 
     Course Intro;
     Professor John; 
     Intro.Set_Professor(&John);                             //we can add a professor to the course
@@ -305,6 +367,18 @@ int main(){
     semester[1].push_back(Data_Structs);
     Course PC_Architecture;
     semester[1].push_back(PC_Architecture);
+    string a = "Themis";
+    int y = 4;
+    string ide = "sdi2000071";
+    string oc = "student";
+    string pas = "6946082278tjk";
+    Student me(a, ide, oc, 4, 0.0, pas, 0);
+    secretary = secretary + me;
+    Student temp = secretary.Get_stud(0);
+        secretary = secretary + me;
+
+    cout<<"IN THE VECTOR STUDENTS "<<temp.Get_year()<<endl;
+    cout<<"OAASS "<< temp.Get_name();
     cout << "\n\nMyStudy Menu:\nPress 1 if Student, 2 if Professor, 3 if Secretary." << endl;
     int path;
     cin >> path;

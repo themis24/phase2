@@ -95,6 +95,7 @@ class Professor: public Person{
             return password;
         }
         string Get_username(){
+            cout<<"In get "<<username<<endl;
             return username;
         }
         void Set_password(const string& newpass){
@@ -105,8 +106,14 @@ class Professor: public Person{
             //cout << "Created a new Professor." << endl;
         }
         Professor(const Professor& copied)
-            : Person(copied), password(copied.password) {
+            : Person(copied), username(copied.username),password(copied.password) {
             //cout << "Created a new Professor by copying." << endl;
+        }
+        Professor(const string& user, const string& word)
+        {
+            username.assign(user);
+            cout<<"Constructopr "<<username<<endl;
+            password.assign(word);
         }
         Professor(){
             //cout << "Created a new Professor." << endl;
@@ -227,9 +234,19 @@ class Secretary{
         vector<Student*> students;
         vector<Professor*> professors;
         string name;//probably gonna make this a vector and search with login just like student
+        string passw = "verysecurepassword";
     public:
+        void p(){
+            cout<<"iuybvgrfeoibyg "<<professors[1]->Get_username()<<endl;
+        }
+        string Get_passw(){
+            return passw;
+        }
         Student* Get_stud(int i){
             return students[i];
+        }
+        Professor* Get_prof(int i){
+            return professors[i];
         }
         Secretary(string n):name(n){                            //constructor and destructor (2.1)
             //cout << "Constructed the secretary." << endl;
@@ -240,6 +257,9 @@ class Secretary{
             }
             for(int i = 0; i < students.size(); i++){             //dont forget to delete every person inside the list
                 delete students[i];
+            }
+            for(int i = 0; i < professors.size(); i++){             //dont forget to delete every person inside the list
+                delete professors[i];
             }
             //cout << "Destructed the secretary." << endl;
         }
@@ -279,11 +299,12 @@ class Secretary{
             }
             return 0;
         }
-        Professor* search_id_prof(const string &username){
+        Professor* search_id_prof(const string& username){
             for(int i = 0; i < professors.size(); i++){
                 Professor *temp = professors[i];
+                cout<<"IN SEARCH"<<temp->Get_username()<<endl;
                 string c = temp->Get_username();
-                cout << "Comparing: " << c << " with " << username << endl;
+                //cout << "Comparing: " << c << " with " << username << endl;
                 if(c == username){
                     return temp;
                 }
@@ -441,7 +462,7 @@ void teach(Secretary &secretary){
         cin >> choice;
         while(choice != 3){
             if(choice == 1){
-
+                
             }
             else if(choice == 2){
                 string newp;
@@ -459,6 +480,26 @@ void teach(Secretary &secretary){
             cin >> choice;
         }
 
+    }
+}
+
+void employee(Secretary& secretary){
+    cout<<"Give the employee password."<<endl;
+    string pass;
+    cin >> pass;
+    if(cin == secretary.Get_passw()){
+        cout<<"Press 1 if you want to edit professor related data." << endl << "Press 2 if you want to edit student related data." << endl << "Press 3 if you want to edit semester data." << endl;
+        int choice;
+        cin >> choice;
+        if(choice == 1){
+
+        }
+        else if(choice == 2){
+    
+        }
+        else if(choice ==3){
+            
+        }
     }
 }
 
@@ -481,13 +522,21 @@ int main(){
     string ide = "sdi2000071";
     string oc = "student";
     string pas = "ilikecar";
-    Professor em(a, ide, oc, pas);
-    secretary = secretary + em;
+    string profid= "sdi1";
+    string pasaaa = "pass";
+    Professor mf( profid, pasaaa);
+    secretary = secretary + mf;
     Student me(a, ide, oc, 4, 0.0, pas, 0);
     secretary = secretary + me;
     Student* temp = secretary.Get_stud(0);
     secretary = secretary + me;
-    secretary = secretary + em;
+    secretary = secretary + mf;
+    string u = mf.Get_username();
+    //cout<<u<<endl;
+    Professor* temp2 = secretary.Get_prof(0);
+    string neppp = temp2->Get_username();
+    cout<<"NIGGER "<<neppp<<endl;
+    secretary.p();
     //cout<<"IN THE VECTOR STUDENTS "<<temp.Get_year()<<endl;
     //cout<<"OAASS "<< temp.Get_name();
     cout << "\n\nMyStudy Menu:\nPress 1 if Student, 2 if Professor, 3 if Secretary." << endl;
@@ -501,11 +550,15 @@ int main(){
         teach(secretary);
         return 0;
     }
-    Student* temp2 = secretary.Get_stud(0); 
+    if(path == 3){
+        employee(secretary);
+        return 0;
+    }
+    /*Student* temp2 = secretary.Get_stud(0); 
     //*temp2 = secretary.Get_stud(0);
     string newp = temp->Get_password();
     cout << newp <<endl;
     float f = temp->Get_average();
-    cout<<f<<endl;
+    cout<<f<<endl;*/
     return 0;
 }

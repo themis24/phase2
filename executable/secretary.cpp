@@ -258,10 +258,10 @@ class Secretary{
             }
             return 0;
         }
-        int search_id_stud(int id, string stud_or_teacher){              //search for any person based on their university id but with only their sdi as input
+        int search_id_stud(int id){              //search for any person based on their university id but with only their sdi as input
             for(int i = 0; i < students.size(); i++){             //instead of working with strings i just
                 Student *temp = students[i];
-                cout<<temp->Get_id()<<endl;
+                cout<<"STUDID"<<temp->Get_id()<<endl;
                 int c = temp->Get_id();
                 if(id == c){                  //if the ids match you found them
                     //if(stud_or_teacher == people[i]->occupation){
@@ -294,7 +294,7 @@ class Secretary{
         }
 };
 
-void stud(){
+void stud(Secretary &secretary){
     string input;    
     cout << "Please provide your University ID." << endl;
     cin >> input;
@@ -304,13 +304,15 @@ void stud(){
         cout << "You have entered a non valid University. Proper syntax is:\nsdi1234567 (sdi followed by 7 numbers)" << endl;
         return;
     }
-    Secretary secretary("temp");
-    string n = "student";
     int s = 0;
-    s = secretary.search_id_stud(id, n);
-    if(s != -1){
+    s = secretary.search_id_stud(id);
+    cout << s << endl;
+    if(s == -1){
         cout << "The University ID you have entered doesnt exist." << endl;
         return;
+    }
+    if(s == id){
+        cout << "ID found." << endl;
     }
     cout << "Enter password." << endl;
     string pass;
@@ -376,15 +378,14 @@ int main(){
     Student me(a, ide, oc, 4, 0.0, pas, 0);
     secretary = secretary + me;
     Student temp = secretary.Get_stud(0);
-        secretary = secretary + me;
-
+    secretary = secretary + me;
     cout<<"IN THE VECTOR STUDENTS "<<temp.Get_year()<<endl;
     cout<<"OAASS "<< temp.Get_name();
     cout << "\n\nMyStudy Menu:\nPress 1 if Student, 2 if Professor, 3 if Secretary." << endl;
     int path;
     cin >> path;
     if(path == 1){  //use exception here and on the others
-        stud();
+        stud(secretary);
         return 0;
     }
     return 0;

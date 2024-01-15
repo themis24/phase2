@@ -6,8 +6,9 @@
 using namespace std;
 
 
+ //for the students we turn all ids to ints cause its much faster when searching for them. We dont need to do this for the professors because theyre too few and we can afford to compare strings
 
-int valid_id(string id){
+int valid_id_stud(string id){
     if (id.length() != 10){                                     // Check the length
         cout << "Error: University ID is invalid." << endl;
         return 0;                                               //return as non valid
@@ -87,13 +88,20 @@ int Person::count = 0;                                      //initialise the cou
 
 class Professor: public Person{
     private:
+        string username;
         string password;
     public:
         string Get_password(){
             return password;
         }
-        Professor(const string& n, long int num, long int id, string oc, const string& newpass)
-            : Person(n, id, oc), password(newpass){                                      //call base class constructor
+        string Get_username(){
+            return username;
+        }
+        void Set_password(const string& newpass){
+            password = newpass;
+        }
+        Professor(const string& n, const string& id, const string& oc, const string& newpass)
+            : Person(n, 0, oc), password(newpass), username(id){                                      //call base class constructor
             //cout << "Created a new Professor." << endl;
         }
         Professor(const Professor& copied)
@@ -160,7 +168,7 @@ class Student: public Person{
         int average = 0;
         string password;
         int points = 0; 
-        list<Course> current_semester;
+        list<Course*> current_semester;
         static int stud_count;
     public:
         string Get_name(){
@@ -198,7 +206,7 @@ class Student: public Person{
         }
         //dont forget to write an instruction thing for this cause its long
         Student(const string& n, string& id, string& oc, int studentYear, int studentAverage, const string& studentPassword, int studentPoints)
-            : Person(n, valid_id(id), oc),                                      //call base class constructor
+            : Person(n, valid_id_stud(id), oc),                                      //call base class constructor
             year(studentYear), average(studentAverage), password(studentPassword), points(studentPoints) {
             //cout << "Created a new Student." << endl;
         }
@@ -247,6 +255,12 @@ class Secretary{
             //cout<<"stud:"<<students.size()<<endl;
             return *this;
         }
+        Secretary& operator+(Professor& prof){                    //overload the += operator to add a person with dynamic memory allocation (2.2)
+            Professor* temp = new Professor(prof);                               //make a temp of the values you need and got via the main or function call
+            professors.push_back(temp);                            //put the person inside the vector
+            cout<<"prof:"<<professors.size()<<endl;
+            return *this;
+        }
         bool search(Student target){                             //search for any person based on their university id (2.4)
             for(int i = 0; i < students.size(); i++){
                 if(target.Get_id() == students[i]->Get_id()){     //if the ids match you found them
@@ -264,6 +278,17 @@ class Secretary{
                 }
             }
             return 0;
+        }
+        Professor* search_id_prof(const string &username){
+            for(int i = 0; i < professors.size(); i++){
+                Professor *temp = professors[i];
+                string c = temp->Get_username();
+                cout << "Comparing: " << c << " with " << username << endl;
+                if(c == username){
+                    return temp;
+                }
+            }
+            return nullptr;
         }
         Student* search_id_stud(int id){              //search for any person based on their university id but with only their sdi as input
             for(int i = 0; i < students.size(); i++){             //instead of working with strings i just
@@ -303,14 +328,14 @@ void stud(Secretary &secretary){
     string input;    
     cout << "Please provide your University ID." << endl;
     cin >> input;
-    int id = valid_id(input);
+    int id = valid_id_stud(input);
     cout<<id<<endl;
     if(id == 0){
         cout << "You have entered a non valid University. Proper syntax is:\nsdi1234567 (sdi followed by 7 numbers)" << endl;
         return;
     }
     Student* s;
-    s = secretary.search_id_stud(id);
+    s = secretary.search_id_stud(id);   //search for the student id and if it exists we have the data already in here
     if(!s){
         cout << "The University ID you have entered doesnt exist." << endl;
         return;
@@ -328,22 +353,36 @@ void stud(Secretary &secretary){
         int choice;
         cin >> choice;
         while(choice != 6){
-            /*if(choice == 1){
-                cout << "Press 1 if its winter semester or 2 for spring semester." << endl;
-                int c;
-                cin >> c;
-                int s = 2* s->Get_year();
-                if(c == 1){
-                    s = s - 1;
-                    for(auto it = cursemester[s].begin(); it != semester[s].end(); it++){
+            if(choice == 1){
+                int counter = 0;
+                cout << "Give a number for the upcoming semester"<<endl<<"(E.g.: If youre enrolling for the winter semester of the 2nd year you enter 3.)";
+                int enroll;
+                cin >> enroll;
+                int more = 1;
+                while(counter < 8 || more == 1){    //finishes either when the max of 8 courses has been selected or when we dont want to take anymore
+                    cout << "What semester is the course in?(You can only enroll for courses of this semester or the ones in previous years)" << endl;
+                    int c;
+                    cin >> c;
+                    int sim = 2 * (s->Get_year());
+                    /*if(c == 1){
+                        sim = sim - 1;
+                        cout << "Available courses" <<endl;
+                        for(auto it = semester[sim].begin(); it != semester[sim].end(); it++){
 
+                        }
+                        for(const auto& course : semester[i]){
+                            cout << "Course Name: " << course.Get_name() << ", ECTS Points: " << course.Get_ects() << endl;
+                        }
                     }
-                }
-                if(c == 2){
-                    for(auto it = semester[s].begin(); it != semester[s].end(); it++)
+                    if(c == 2){
+                        for(auto it = semester[sim].begin(); it != semester[sim].end(); it++)
+                        for(const auto& course : semester[sim - 1]){
+                            cout << "Course Name: " << course.Get_name() << ", ECTS Points: " << course.Get_ects() << endl;
+                        }  
+                    }*/
 
                 }
-            }*/
+            }
             if(choice == 2){
                 float av = s->Get_average();
                 cout << "Your average is: " << av <<endl<<endl;
@@ -378,9 +417,54 @@ void stud(Secretary &secretary){
     }
 }
 
+void teach(Secretary &secretary){
+    string input;    
+    cout << "Please provide your University ID." << endl;
+    cin >> input;
+    Professor* s;
+    s = secretary.search_id_prof(input);   //search for the student id and if it exists we have the data already in here
+    if(s == nullptr){
+        cout << "The University ID you have entered doesnt exist." << endl;
+        return;
+    }
+    if(input == s->Get_username()){
+        cout << "ID found." << endl;
+    }
+    cout << "Enter password." << endl;
+    string pass;
+    cin >> pass;
+    cout << endl;
+    if(pass == s->Get_password()){
+        cout << "Login successful." << endl<<endl;
+        cout << "Press 1 to show semester statistics."<<endl<<"Press 2 to change password."<<endl<<"Press 3 to logout." << endl<<endl;
+        int choice;
+        cin >> choice;
+        while(choice != 3){
+            if(choice == 1){
+
+            }
+            else if(choice == 2){
+                string newp;
+                cout << endl << "Type your new password." << endl;
+                cin >> newp;
+                cout<<"Confirm the password reset by typing 1"<<endl;
+                int con;
+                cin >> con;
+                if(con == 1){
+                    s->Set_password(newp);
+                    cout<<"Password changed successfully."<<endl<<endl;
+                }
+            }
+            cout << "Press 1 to show semester statistics."<<endl<<"Press 2 to change password."<<endl<<"Press 3 to logout." << endl<<endl;
+            cin >> choice;
+        }
+
+    }
+}
+
 int main(){
     //was intially list but too much work to move around courses so we make it a list
-    static list<Course> semester[8];                               //just to be simpler im gonna initialise the semesters with only 2 courses in each
+    static vector<Course> semester[8];                               //just to be simpler im gonna initialise the semesters with only 2 courses in each
     static Secretary secretary("Bob"); 
     Course Intro;
     Professor John; 
@@ -397,10 +481,13 @@ int main(){
     string ide = "sdi2000071";
     string oc = "student";
     string pas = "ilikecar";
+    Professor em(a, ide, oc, pas);
+    secretary = secretary + em;
     Student me(a, ide, oc, 4, 0.0, pas, 0);
     secretary = secretary + me;
     Student* temp = secretary.Get_stud(0);
     secretary = secretary + me;
+    secretary = secretary + em;
     //cout<<"IN THE VECTOR STUDENTS "<<temp.Get_year()<<endl;
     //cout<<"OAASS "<< temp.Get_name();
     cout << "\n\nMyStudy Menu:\nPress 1 if Student, 2 if Professor, 3 if Secretary." << endl;
@@ -408,7 +495,11 @@ int main(){
     cin >> path;
     if(path == 1){  //use exception here and on the others
         stud(secretary);
-        //return 0;
+        return 0;
+    }
+    if(path == 2){
+        teach(secretary);
+        return 0;
     }
     Student* temp2 = secretary.Get_stud(0); 
     //*temp2 = secretary.Get_stud(0);

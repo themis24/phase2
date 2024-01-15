@@ -310,6 +310,7 @@ void stud(){
     s = secretary.search_id_stud(id, n);
     if(s != -1){
         cout << "The University ID you have entered doesnt exist." << endl;
+        return;
     }
     cout << "Enter password." << endl;
     string pass;

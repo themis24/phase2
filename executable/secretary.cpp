@@ -5,6 +5,8 @@
 #include <list>
 using namespace std;
 
+
+
 int valid_id(string id){
     if (id.length() != 10){                                     // Check the length
         cout << "Error: University ID is invalid." << endl;
@@ -159,6 +161,7 @@ class Student: public Person{
         string password;
         int points = 0; 
         list<Course> current_semester;
+        static int stud_count;
     public:
         string Get_name(){
             return Get_pname();
@@ -207,14 +210,18 @@ class Student: public Person{
         }
 };
 
+int Student::stud_count = -1;
+
+
 class Secretary{
     private:                                                    //each secretary has a name and knows every person
         vector<Person*> people;                                 //we load the data into a list of pointer person
-        string name;
-         vector<Student*> students;
+        vector<Student*> students;
+        vector<Professor*> professors;
+        string name;//probably gonna make this a vector and search with login just like student
     public:
-        Student Get_stud(int i){
-            return *students[i];
+        Student* Get_stud(int i){
+            return students[i];
         }
         Secretary(string n):name(n){                            //constructor and destructor (2.1)
             //cout << "Constructed the secretary." << endl;
@@ -226,7 +233,7 @@ class Secretary{
             for(int i = 0; i < students.size(); i++){             //dont forget to delete every person inside the list
                 delete students[i];
             }
-            cout << "Destructed the secretary." << endl;
+            //cout << "Destructed the secretary." << endl;
         }
         Secretary& operator+(Person& person){                    //overload the += operator to add a person with dynamic memory allocation (2.2)
             Person* temp = new Person(person);                               //make a temp of the values you need and got via the main or function call
@@ -314,12 +321,13 @@ void stud(Secretary &secretary){
     cout << "Enter password." << endl;
     string pass;
     cin >> pass;
+    cout << endl;
     if(pass == s->Get_password()){
-        cout << "Login successful." << endl;
-        cout << "Press 1 to show your grades for this semester."<<endl<<"Press 2 to show total average."<<endl<<"Press 3 to show your ECTS points."<<endl<<"Press 4 to sign up for a course."<<endl<<"Press 5 to logout." << endl<<endl;
+        cout << "Login successful." << endl<<endl;
+        cout << "Press 1 to show your grades for this semester."<<endl<<"Press 2 to show total average."<<endl<<"Press 3 to show your ECTS points."<<endl<<"Press 4 to sign up for a course."<<endl<<"Press 5 to change password."<<endl<<"Press 6 to logout." << endl<<endl;
         int choice;
         cin >> choice;
-        while(choice != 5){
+        while(choice != 6){
             /*if(choice == 1){
                 cout << "Press 1 if its winter semester or 2 for spring semester." << endl;
                 int c;
@@ -344,10 +352,24 @@ void stud(Secretary &secretary){
                 int epoints = s->Get_points();
                 cout << "Your ECTS points are: "<< epoints << endl<<endl;
             }
-            /*else if(choice == 4){
-
-            }*/
-            cout << "Press 1 to show your grades for this semester."<<endl<<"Press 2 to show total average."<<endl<<"Press 3 to show your ECTS points."<<endl<<"Press 4 to sign up for a course."<<endl<<"Press 5 to logout." << endl<<endl;
+            else if(choice == 4){
+                float f;
+                cin >> f;
+                s->Set_average(f);
+            }
+            else if(choice == 5){
+                string newp;
+                cout << endl << "Type your new password." << endl;
+                cin >> newp;
+                cout<<"Confirm the password reset by typing 1"<<endl;
+                int con;
+                cin >> con;
+                if(con == 1){
+                    s->Set_password(newp);
+                    cout<<"Password changed successfully."<<endl<<endl;
+                }
+            }
+            cout << "Press 1 to show your grades for this semester."<<endl<<"Press 2 to show total average."<<endl<<"Press 3 to show your ECTS points."<<endl<<"Press 4 to sign up for a course."<<endl<<"Press 5 to change your password."<<endl<<"Press 6 to logout" << endl<<endl;
             cin >> choice;
         }
     }
@@ -374,10 +396,10 @@ int main(){
     int y = 4;
     string ide = "sdi2000071";
     string oc = "student";
-    string pas = "ilikecars";
+    string pas = "ilikecar";
     Student me(a, ide, oc, 4, 0.0, pas, 0);
     secretary = secretary + me;
-    Student temp = secretary.Get_stud(0);
+    Student* temp = secretary.Get_stud(0);
     secretary = secretary + me;
     //cout<<"IN THE VECTOR STUDENTS "<<temp.Get_year()<<endl;
     //cout<<"OAASS "<< temp.Get_name();
@@ -386,7 +408,13 @@ int main(){
     cin >> path;
     if(path == 1){  //use exception here and on the others
         stud(secretary);
-        return 0;
+        //return 0;
     }
+    Student* temp2 = secretary.Get_stud(0); 
+    //*temp2 = secretary.Get_stud(0);
+    string newp = temp->Get_password();
+    cout << newp <<endl;
+    float f = temp->Get_average();
+    cout<<f<<endl;
     return 0;
 }

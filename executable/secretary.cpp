@@ -212,8 +212,21 @@ class Secretary{
         vector<Student*> students;
         vector<Professor*> professors;
         vector<Employee*> employees;
+        vector<Semester*> semesters;
         string n = "NIGGER ";
     public:
+        int semesters_size(){
+            return semesters.size();
+        }
+        int studs_size(){
+            return students.size();
+        }
+        int professors_size(){
+            return professors.size();
+        }
+        int employees_size(){
+            return employees.size();
+        }
         string get_n(){
             return n;
         }
@@ -239,6 +252,32 @@ class Secretary{
             }
             //cout << "Destructed the secretary." << endl;
         }
+        Secretary& Delete_stud(const string& id){
+            for(auto it = students.begin(); it != students.end(); ++it){
+                Student *temp = *it;
+                string c = temp->Get_id();
+                if(id == c){                  //if the ids match you found them
+                    delete temp; // Delete the student object
+                    students.erase(it); // Erase the element from the vector
+                    return *this;
+                }
+            }
+            cout<<"The student you want to delete doesnt exist."<<endl;
+            return *this;
+        }
+        Secretary& Delete_prof(const string& id){
+            for(auto it = professors.begin(); it != professors.end(); ++it){
+                Professor *temp = *it;
+                string c = temp->Get_id();
+                if(id == c){                  //if the ids match you found them
+                    delete temp; // Delete the student object
+                    professors.erase(it); // Erase the element from the vector
+                    return *this;
+                }
+            }
+            cout<<"The student you want to delete doesnt exist."<<endl;
+            return *this;
+        }
         Secretary& operator+(Employee& newem){                    //overload the += operator to add a person with dynamic memory allocation (2.2)
             Employee* temp = new Employee(newem);                               //make a temp of the values you need and got via the main or function call
             employees.push_back(temp);                            //put the person inside the vector
@@ -254,7 +293,7 @@ class Secretary{
         Secretary& operator+(Professor& prof){                    //overload the += operator to add a person with dynamic memory allocation (2.2)
             Professor* temp = new Professor(prof);                               //make a temp of the values you need and got via the main or function call
             professors.push_back(temp);                            //put the person inside the vector
-            cout<<"prof:"<<professors.size()<<endl;
+            //cout<<"prof:"<<professors.size()<<endl;
             return *this;
         }
         bool search(Student target){                             //search for any person based on their university id (2.4)
@@ -325,14 +364,46 @@ int Person::count = 0;                                      //initialise the cou
 
 int main(){
     static Secretary secretary;
-    string n = "Themistoklis";
-    string id = "sdi2000071";
-    string pass = "ilikecar";
-    Student me(n, id, pass);
-    secretary = secretary + me;
-    Student* t;
-    t = secretary.Get_stud(0);
-    string tname = t->Get_name();
-    cout<<tname<<endl;
+
+    //5.1
+    cout<<"Number of professors: "<<secretary.professors_size()<<endl;         //prove professors is empty
+    string nameprof = "Eleni";
+    string idprof = "sdi1";
+    string passprof = "ilikebike";
+    Professor eleni(nameprof, idprof, passprof);
+    secretary = secretary + eleni;                 
+    cout<<"Number of professors: "<<secretary.professors_size()<<endl;         //prove its added
+    Professor* tprof;
+    tprof = secretary.Get_prof(0);
+    string tnameprof = tprof->Get_name();           //prove we can add a professor
+    cout<<tnameprof<<endl;
+    Professor* searchprof = secretary.search_id_prof(idprof);
+    cout<<searchprof->Get_id()<<endl;       //prove we can search for the student inside the vector
+    string newnaprof = "Helen";
+    searchprof->Set_name(newnaprof);
+    cout<<searchprof->Get_name()<<endl;
+    secretary.Delete_prof(idprof);              //prove i can delete a student given his uni id
+    cout<<"Number of professors: "<<secretary.professors_size()<<endl;
+
+
+    //5.2
+    cout<<"Number of students: "<<secretary.studs_size()<<endl;         //prove students is empty
+    string nstud = "Themistoklis";
+    string idstud = "sdi2000071";
+    string passstud = "ilikecar";
+    Student me(nstud, idstud, passstud);
+    secretary = secretary + me;                 
+    cout<<"Number of students: "<<secretary.studs_size()<<endl;         //prove its added
+    Student* tstud;
+    tstud = secretary.Get_stud(0);
+    string tnamestud = tstud->Get_name();           //prove we can add a student
+    cout<<tnamestud<<endl;
+    Student* searchstud = secretary.search_id_stud(idstud);
+    cout<<searchstud->Get_id()<<endl;       //prove we can search for the student inside the vector
+    string newnastud = "Themis";
+    searchstud->Set_name(newnastud);
+    cout<<searchstud->Get_name()<<endl;
+    secretary.Delete_stud(idstud);              //prove i can delete a student given his uni id
+    cout<<"Number of students: "<<secretary.studs_size()<<endl;
     return 0;
 }

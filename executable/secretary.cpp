@@ -457,10 +457,14 @@ int main(){
     try {                                                               //prove i can modify a course inside a semester
         Course& modify = first.search_course("Intro to Programming");
         cout << "Found course: " << modify.Get_name() << endl;
-        string newcoursename = "Math";
-        modify.Set_name(newcoursename);
+        string newnamecourse = "John";
+        string newidcourse = "sdi54";
+        string newpasscourse = "INeedToMakeTheMenuTooButThisIsJustDemonstratingItWorks";
+        Professor john(newnamecourse, newidcourse, newpasscourse);
+        modify.Set_professor(john);
         vector<Course> check = first.Get_courses();
-        cout <<"New name of course: "<<check[0].Get_name()<<endl;
+        Professor testcourse = check[0].Get_professor();
+        cout <<"New name of professor: "<<testcourse.Get_name()<<endl;
     } catch (const out_of_range& e) {
         cout << "Course not found: " << e.what() << endl;
     }

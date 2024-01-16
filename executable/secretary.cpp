@@ -213,7 +213,6 @@ class Secretary{
         vector<Professor*> professors;
         vector<Employee*> employees;
         vector<Semester*> semesters;
-        string n = "NIGGER ";
     public:
         int semesters_size(){
             return semesters.size();

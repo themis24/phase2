@@ -162,8 +162,11 @@ class Semester{
     private:
         vector<Course> courses;
     public:
-        Semester(const vector<Course>& initialCourses)
-        : courses(initialCourses){}
+        int size_course(){
+            return courses.size();
+        }
+        /*Semester(const vector<Course>& initialCourses)
+        : courses(initialCourses){}*/
         vector<Course>& Get_courses(){
             return courses;
         }
@@ -438,5 +441,10 @@ int main(){
     int ectscourse = 6;
     int man = 1;
     Course intro(eleni,namecourse, ectscourse,man);
+    vector<Course*> firstcourses;
+    firstcourses.push_back(&intro);
+    Semester first;
+    first.Add_course(intro);
+    cout<<"Courses in first semester: "<<first.size_course()<<endl;
     return 0;
 }

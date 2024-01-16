@@ -6,45 +6,6 @@
 #define MIN_ECTS 240
 using namespace std;
 
-class Course{
-    private:
-        Professor p;
-        string name;
-        int ects_points;
-        int mandatory;
-    public:
-        void Set_professor(const Professor& newprofessor) {
-            p = newprofessor;
-        }
-        Professor& Get_professor(){
-            return p;
-        }
-        string Get_name(){
-            return name;
-        }
-        int Get_ects(){
-            return ects_points;
-        }
-        int Get_mandatory(){
-            return mandatory;
-        }
-        void Set_name(const string& newname){
-            name = newname;
-        }
-        void Set_ects(int x){
-            ects_points = x;
-        }
-        void Set_mandatory(int x){
-            mandatory = x;
-        }
-        Course(const string& n, int epo, int mand)
-        :name(n), ects_points(epo), mandatory(mand){}
-        Course(const Course& copied)
-        : name(copied.name), ects_points(copied.ects_points), mandatory(copied.mandatory)
-        {}
-        ~Course(){}
-};
-
 class Person{
     private:                                                        //the characteristics that students and professors have in common
         string name;
@@ -104,6 +65,63 @@ class Person{
         }
 };
 
+
+class Course;
+
+class Professor: public Person{
+    private:
+        vector<Course> current_semester;
+    public:
+
+        Professor(const string& n, const string& id, const string& p)
+        :Person(n, id, p){}
+        Professor(){}
+        Professor(const Professor& copied)
+        :Person(copied), current_semester(copied.current_semester){}
+        ~Professor(){
+
+        }
+};
+
+class Course{
+    private:
+        Professor p;
+        string name;
+        int ects_points;
+        int mandatory;
+    public:
+        void Set_professor(const Professor& newprofessor) {
+            p = newprofessor;
+        }
+        Professor& Get_professor(){
+            return p;
+        }
+        string Get_name(){
+            return name;
+        }
+        int Get_ects(){
+            return ects_points;
+        }
+        int Get_mandatory(){
+            return mandatory;
+        }
+        void Set_name(const string& newname){
+            name = newname;
+        }
+        void Set_ects(int x){
+            ects_points = x;
+        }
+        void Set_mandatory(int x){
+            mandatory = x;
+        }
+        Course( Professor& s,const string& n, int epo, int mand)
+        :p(s),name(n), ects_points(epo), mandatory(mand){}
+        Course(const Course& copied)
+        :p(copied.p) ,name(copied.name), ects_points(copied.ects_points), mandatory(copied.mandatory)
+        {}
+        ~Course(){}
+};
+
 class Student: public Person{
     private:
         vector<Course> Passed;
@@ -140,33 +158,16 @@ class Student: public Person{
         }
 };
 
-class Professor: public Person{
-    private:
-        vector<Course> current_semester;
-    public:
-
-        Professor(const string& n, const string& id, const string& p)
-        :Person(n, id, p){}
-        Professor(){}
-        Professor(const Professor& copied)
-        :Person(copied), current_semester(copied.current_semester){}
-        ~Professor(){
-
-        }
-};
-
 class Semester{
     private:
         vector<Course> courses;
     public:
-        const Professor& Get_professor(){
-            return p;
-        }
         Semester(const vector<Course>& initialCourses)
         : courses(initialCourses){}
         vector<Course>& Get_courses(){
             return courses;
         }
+        Semester(){}
         void Add_course(const Course& newCourse){
             courses.push_back(newCourse);
         }
@@ -218,7 +219,11 @@ class Secretary{
         vector<Semester*> semesters;
     public:
         int sem_size(){
-            return semesters.courses.size();
+            int total_courses = 0;
+            for (const auto& semester : semesters) {
+                total_courses += semester->Get_courses().size();
+            }
+            return total_courses;
         }
         int semesters_size(){
             return semesters.size();
@@ -429,9 +434,9 @@ int main(){
 
     //5.3
     cout<<"Number of semesters: "<<secretary.semesters_size()<<endl;         //prove semestersents is empty
-    Professor eleni(nameprof, idprof, passprof);
-    Semester first;
-
-
+    string namecourse = "Intro to Programming";
+    int ectscourse = 6;
+    int man = 1;
+    Course intro(eleni,namecourse, ectscourse,man);
     return 0;
 }

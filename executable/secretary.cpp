@@ -130,6 +130,9 @@ class Student: public Person{
         float average;
         int year;
     public:
+        Course& Get_courses(){
+            return current_semester;
+        }
         int Get_ects(){
             return ects;
         }
@@ -454,7 +457,7 @@ int main(){
     Semester first;
     first.Add_course(intro);
     cout<<"Courses in first semester: "<<first.size_course()<<endl;     //prove we can add courses to a semester
-    try {                                                               //prove i can modify a course inside a semester
+    try{                                                               //prove i can modify a course inside a semester
         Course& modify = first.search_course("Intro to Programming");
         cout << "Found course: " << modify.Get_name() << endl;
         string newnamecourse = "John";
@@ -465,9 +468,32 @@ int main(){
         vector<Course> check = first.Get_courses();
         Professor testcourse = check[0].Get_professor();
         cout <<"New name of professor: "<<testcourse.Get_name()<<endl;
-    } catch (const out_of_range& e) {
-        cout << "Course not found: " << e.what() << endl;
+    } 
+    catch(const out_of_range){
+        cout << "Course not found." << endl;
     }
     
+    //5.5
+    string name5 = "Mark";
+    string id5 = "sdimark";
+    string pass5 = "immark";
+    Student mark(name5, id5, pass5);
+    mark.Set_year(5);
+    string namec5;
+    cout<<"Enter the semester you want to choose:"<<endl;
+    int sc5;
+    cin>> sc5;
+    if(sc5/2 >= sc5){
+        cout<<"Enter the course you want to choose: "<<endl;
+        string choicec5;
+        cin>>choicec5;
+        if(sc5 == 1){//also will do for the rest                                                               
+            Course& modify = first.search_course(choicec5);
+            cout << "Found course: " << modify.Get_name() << endl;
+            Student checkmark = mark.Get_courses();
+            checkmark.push_back(modify);
+        } 
+    }
+//    vector<Course> check = mark.Get_courses();
     return 0;
 }

@@ -165,6 +165,14 @@ class Semester{
         int size_course(){
             return courses.size();
         }
+        Course& search_course(const string& name){
+            for(size_t i = 0; i < courses.size(); ++i){
+                if(courses[i].Get_name() == name){
+                    return courses[i];
+                }
+            }
+            throw out_of_range("Course not found");
+        }
         /*Semester(const vector<Course>& initialCourses)
         : courses(initialCourses){}*/
         vector<Course>& Get_courses(){
@@ -279,18 +287,18 @@ class Secretary{
             return *this;
         }
         Secretary& Delete_course(const string& name){
-        for (auto it1 = semesters.begin(); it1 != semesters.end(); ++it1) {
-            Semester* tsem = *it1;
-            for (auto it2 = tsem->Get_courses().begin(); it2 != tsem->Get_courses().end(); ++it2) {
-                Course* temp = &(*it2);
-                string c = temp->Get_name();
-                if (name == c) { // if the names match, you found the course
-                    it2 = tsem->Get_courses().erase(it2); // Erase the element from the vector
-                    delete temp; // Delete the course object
-                    return *this;
+            for (auto it1 = semesters.begin(); it1 != semesters.end(); ++it1){
+                Semester* tsem = *it1;
+                for (auto it2 = tsem->Get_courses().begin(); it2 != tsem->Get_courses().end(); ++it2) {
+                    Course* temp = &(*it2);
+                    string c = temp->Get_name();
+                    if (name == c) { // if the names match, you found the course
+                        it2 = tsem->Get_courses().erase(it2); // Erase the element from the vector
+                        delete temp; // Delete the course object
+                        return *this;
+                    }
                 }
             }
-        }
             cout<<"The s you want to delete doesnt exist."<<endl;
             return *this;
         }
@@ -414,7 +422,7 @@ int main(){
     secretary.Delete_prof(idprof);              //prove i can delete a student given his uni id
     cout<<"Number of professors: "<<secretary.professors_size()<<endl;
 
-
+/*
     //5.2
     cout<<"Number of students: "<<secretary.studs_size()<<endl;         //prove students is empty
     string nstud = "Themistoklis";
@@ -434,7 +442,7 @@ int main(){
     cout<<searchstud->Get_name()<<endl;
     secretary.Delete_stud(idstud);              //prove i can delete a student given his uni id
     cout<<"Number of students: "<<secretary.studs_size()<<endl;
-
+*/
     //5.3
     cout<<"Number of semesters: "<<secretary.semesters_size()<<endl;         //prove semestersents is empty
     string namecourse = "Intro to Programming";
@@ -445,6 +453,17 @@ int main(){
     firstcourses.push_back(&intro);
     Semester first;
     first.Add_course(intro);
-    cout<<"Courses in first semester: "<<first.size_course()<<endl;
+    cout<<"Courses in first semester: "<<first.size_course()<<endl;     //prove we can add courses to a semester
+    try {                                                               //prove i can modify a course inside a semester
+        Course& modify = first.search_course("Intro to Programming");
+        cout << "Found course: " << modify.Get_name() << endl;
+        string newcoursename = "Math";
+        modify.Set_name(newcoursename);
+        vector<Course> check = first.Get_courses();
+        cout <<"New name of course: "<<check[0].Get_name()<<endl;
+    } catch (const out_of_range& e) {
+        cout << "Course not found: " << e.what() << endl;
+    }
+    
     return 0;
 }

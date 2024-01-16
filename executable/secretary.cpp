@@ -8,10 +8,17 @@ using namespace std;
 
 class Course{
     private:
+        Professor p;
         string name;
         int ects_points;
         int mandatory;
     public:
+        void Set_professor(const Professor& newprofessor) {
+            p = newprofessor;
+        }
+        Professor& Get_professor(){
+            return p;
+        }
         string Get_name(){
             return name;
         }
@@ -151,13 +158,9 @@ class Professor: public Person{
 class Semester{
     private:
         vector<Course> courses;
-        Professor p;
     public:
         const Professor& Get_professor(){
             return p;
-        }
-        void Set_professor(const Professor& newprofessor) {
-            p = newprofessor;
         }
         Semester(const vector<Course>& initialCourses)
         : courses(initialCourses){}
@@ -214,6 +217,9 @@ class Secretary{
         vector<Employee*> employees;
         vector<Semester*> semesters;
     public:
+        int sem_size(){
+            return semesters.courses.size();
+        }
         int semesters_size(){
             return semesters.size();
         }
@@ -226,9 +232,6 @@ class Secretary{
         int employees_size(){
             return employees.size();
         }
-        string get_n(){
-            return n;
-        }
         Student* Get_stud(int i){
             return students[i];
         }
@@ -237,6 +240,9 @@ class Secretary{
         }
         Employee* Get_empl(int i){
             return employees[i];
+        }
+        Semester* Get_sem(int i){
+            return semesters[i];
         }
         Secretary(){}
         ~Secretary(){
@@ -264,6 +270,22 @@ class Secretary{
             cout<<"The student you want to delete doesnt exist."<<endl;
             return *this;
         }
+        Secretary& Delete_course(const string& name){
+        for (auto it1 = semesters.begin(); it1 != semesters.end(); ++it1) {
+            Semester* tsem = *it1;
+            for (auto it2 = tsem->Get_courses().begin(); it2 != tsem->Get_courses().end(); ++it2) {
+                Course* temp = &(*it2);
+                string c = temp->Get_name();
+                if (name == c) { // if the names match, you found the course
+                    it2 = tsem->Get_courses().erase(it2); // Erase the element from the vector
+                    delete temp; // Delete the course object
+                    return *this;
+                }
+            }
+        }
+            cout<<"The s you want to delete doesnt exist."<<endl;
+            return *this;
+        }
         Secretary& Delete_prof(const string& id){
             for(auto it = professors.begin(); it != professors.end(); ++it){
                 Professor *temp = *it;
@@ -274,7 +296,7 @@ class Secretary{
                     return *this;
                 }
             }
-            cout<<"The student you want to delete doesnt exist."<<endl;
+            cout<<"The professor you want to delete doesnt exist."<<endl;
             return *this;
         }
         Secretary& operator+(Employee& newem){                    //overload the += operator to add a person with dynamic memory allocation (2.2)
@@ -404,5 +426,12 @@ int main(){
     cout<<searchstud->Get_name()<<endl;
     secretary.Delete_stud(idstud);              //prove i can delete a student given his uni id
     cout<<"Number of students: "<<secretary.studs_size()<<endl;
+
+    //5.3
+    cout<<"Number of semesters: "<<secretary.semesters_size()<<endl;         //prove semestersents is empty
+    Professor eleni(nameprof, idprof, passprof);
+    Semester first;
+
+
     return 0;
 }

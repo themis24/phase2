@@ -650,7 +650,6 @@ void employee(Secretary& secretary){
                     //course
                 }
             }
-            }
             else if(choice == 3){
 
             }

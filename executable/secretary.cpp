@@ -123,6 +123,8 @@ class Student: public Person{
         void Set_year(int x){
             year = x;
         }
+        Student(const Student& copied)
+            : Person(copied), ects(copied.ects), average(copied.average), year(copied.year){}
         Student(const string& n, const string& id, const string& p)
         :Person(n, id, p){}
         Student(): year(0), average(0), ects(0){}
@@ -210,7 +212,11 @@ class Secretary{
         vector<Student*> students;
         vector<Professor*> professors;
         vector<Employee*> employees;
+        string n = "NIGGER ";
     public:
+        string get_n(){
+            return n;
+        }
         Student* Get_stud(int i){
             return students[i];
         }
@@ -301,7 +307,7 @@ class Secretary{
             string p;
             in>>p;
             Employee* ne = new Employee(n,i,p);
-            employees.push_back(ne)
+            employees.push_back(ne);
             return in;
         }                                                       //overload the out<< operator and print every person in the list of the secretary
         friend ostream& operator<<(ostream& out, const Secretary& Sec, int i){
@@ -318,7 +324,15 @@ int Person::count = 0;                                      //initialise the cou
 
 
 int main(){
-    
-
+    static Secretary secretary;
+    string n = "Themistoklis";
+    string id = "sdi2000071";
+    string pass = "ilikecar";
+    Student me(n, id, pass);
+    secretary = secretary + me;
+    Student* t;
+    t = secretary.Get_stud(0);
+    string tname = t->Get_name();
+    cout<<tname<<endl;
     return 0;
 }

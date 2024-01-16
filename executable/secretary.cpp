@@ -101,6 +101,9 @@ class Professor: public Person{
         void Set_password(const string& newpass){
             password = newpass;
         }
+        void Set_username(const string& newname){
+            password = newname;
+        }
         Professor(const string& n, const string& id, const string& oc, const string& newpass)
             : Person(n, 0, oc), password(newpass), username(id){                                      //call base class constructor
             //cout << "Created a new Professor." << endl;
@@ -488,19 +491,176 @@ void employee(Secretary& secretary){
     string pass;
     cin >> pass;
     if(cin == secretary.Get_passw()){
-        cout<<"Press 1 if you want to edit professor related data." << endl << "Press 2 if you want to edit student related data." << endl << "Press 3 if you want to edit semester data." << endl;
+        cout<<"Press 1 if you want to edit professor related data." << endl << "Press 2 if you want to edit student related data." << endl << "Press 3 if you want to edit semester data." << endl << "Press 4 to logout." << endl;
         int choice;
         cin >> choice;
-        if(choice == 1){
+        while(choice != 4){      
+            if(choice == 1){
+                cout << "Press 1 if you want to add a professor, 2 if you want to edit one, 3 if you want to delete one." << endl;
+                int pchoice;
+                cin >> pchoice;
+                cout << "Provide the Professors University ID." << endl;
+                string prof;
+                cin >> prof;
+                Student* s;
+                s = secretary.search_id_prof(prof);   //search for the student id and if it exists we have the data already in here
+                if(!s){
+                    cout << "The University ID you have entered doesnt exist." << endl;
+                    return;
+                }
+                if(s->Get_id() == prof){
+                    cout << "ID found." << endl;
+                }
+                
+                if(pchoice == 1){
+                    string name;
+                    cout << "Give the professors name."<< endl;
+                    cin >> name;
+                    string pass;
+                    cout << "Give the password." << endl;
+                    cin >> pass;
+                    Professor* newprof = new Professor( name, pass);
+                }
+                else if(pchoice == 2){
+                    cout << "Provide the Professors University ID." << endl;
+                    string prof;
+                    cin >> prof;
+                    Student* s;
+                    s = secretary.search_id_prof(prof);   //search for the student id and if it exists we have the data already in here
+                    if(!s){
+                        cout << "The University ID you have entered doesnt exist." << endl;
+                    }
+                    if(s->Get_id() == prof){
+                        cout << "ID found." << endl;
+                        cout<< "Press 1 if you want to edit the username or 2 if you want to edit the password" << endl;
+                        int edit;
+                        cin >> edit;
+                        if(edit == 1){
+                            string na;
+                            cout << "Provide new name." << endl;
+                            cin >> na;
+                            s->Set_username(na);
+                        }
+                        if(edit == 2){
+                            string na;
+                            cout << "Provide new password." << endl;
+                            cin >> na;
+                            s->Set_password(na);
+                        }
+                    }
+                }
+                else if(pchoice == 3){
+                    cout << "Provide the Professors University ID." << endl;
+                    string prof;
+                    cin >> prof;
+                    Student* s;
+                    s = secretary.search_id_prof(prof);   //search for the student id and if it exists we have the data already in here
+                    if(!s){
+                        cout << "The University ID you have entered doesnt exist." << endl;
+                        return;
+                    }
+                    if(s->Get_id() == prof){
+                        cout << "ID found." << endl;
+                        delete *s;
+                    }
+                }
+            }
+            else if(choice == 2){
+                cout << "Press 1 if you want to add a student, 2 if you want to edit one, 3 if you want to delete one." << endl;
+                int pchoice;
+                cin >> pchoice;
+                cout << "Provide the Students University ID." << endl;
+                string stu;
+                cin >> stu;
+                Student* s;
+                s = secretary.search_id_stud(id);   //search for the student id and if it exists we have the data already in here
+                if(!s){
+                    cout << "The University ID you have entered doesnt exist." << endl;
+                    return;
+                }
+                if(s->Get_id() == id){
+                    cout << "ID found." << endl;
+                }
+                
+                if(pchoice == 1){
+                    string name;
+                    cout << "Give the students name."<< endl;
+                    cin >> name;
+                    string pass;
+                    cout << "Give the password." << endl;
+                    cin >> pass;
+                    string id;
+                    cout << "Give the Univerisity ID." << endl;
+                    cin >> id;
+                    string ocu;
+                    cout << "Give the occupation." << endl;
+                    cin >> ocu;
+                    int ye;
+                    cout << "Give the year theyre in." << endl;
+                    cin >> ye;
+                    float ave;
+                    cout << "Give the average." << endl;
+                    cin >> ave;
+                    int points;
+                    cout << "Give the amount of points." << endl;
+                    cin >> points;
+                    Student* newprof = new Student( name, id, ocu, ye, ave, pass, points);
+                }
+                else if(pchoice == 2){
+                    cout << "Provide the Students University ID." << endl;
+                    string stu;
+                    cin >> stu;
+                    Student* s;
+                    s = secretary.search_id_stud(stu);   //search for the student id and if it exists we have the data already in here
+                    if(!s){
+                        cout << "The University ID you have entered doesnt exist." << endl;
+                    }
+                    if(s->Get_id() == stu){
+                        cout << "ID found." << endl;
+                        cout<< "Press 1 if you want to edit the name."<< endl<<"Press 2 if you want to edit the average." << endl<<"Press 3 if you want to edit the password." << endl<<"Press 4 if you want to edit the points." << endl;
+                        int edit;
+                        cin >> edit;
+                        if(edit == 1){
+                            string na;
+                            cout << "Provide new name." << endl;
+                            cin >> na;
+                            s->Set_name(na);
+                        }
+                        else if(edit == 2){
+                            float na;
+                            cout << "Provide new average." << endl;
+                            cin >> na;
+                            s->Set_average(na);
+                        }
+                        else if(edit == 3){
+                            string na;
+                            cout << "Provide new password." << endl;
+                            cin >> na;
+                            s->Set_password(na);
+                        }
+                        else if(edit == 4){
+                            int na;
+                            cout << "Provide new points." << endl;
+                            cin >> na;
+                            s->Set_points(na);
+                        }
+                    }
+                }
+                else if(pchoice == 3){
+                    //course
+                }
+            }
+            }
+            else if(choice == 3){
 
+            }
+            cout<<"Press 1 if you want to edit professor related data." << endl << "Press 2 if you want to edit student related data." << endl << "Press 3 if you want to edit semester data." << endl << "Press 4 to logout." << endl;
+            cin >> choice;
         }
-        else if(choice == 2){
-    
-        }
-        else if(choice ==3){
-            
-        }
+        return 0;
     }
+    cout << "Wrong password." << endl;
+    return;
 }
 
 int main(){

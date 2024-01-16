@@ -2714,6 +2714,12 @@ class Student: public Person{
         void Set_points(int x){
             points = x;
         }
+        void Set_name(const string& x){
+            name = x;
+        }
+        void Set_id(const string& id){
+            uni_id = id;
+        }
         //dont forget to write an instruction thing for this cause its long
         Student(const string& n, string& id, string& oc, int studentYear, int studentAverage, const string& studentPassword, int studentPoints)
             : Person(n, valid_id_stud(id), oc),                                      //call base class constructor

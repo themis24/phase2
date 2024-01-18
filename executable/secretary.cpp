@@ -1,3 +1,4 @@
+
 #include <iostream>
 #include <string>
 #include <cstring>
@@ -70,7 +71,7 @@ class Course;
 
 class Professor: public Person{
     private:
-        vector<Course> current_semester;
+        vector<Course*> current_semester;
     public:
 
         Professor(const string& n, const string& id, const string& p)
@@ -85,15 +86,11 @@ class Professor: public Person{
 
 class Course{
     private:
-        string id;
         Professor p;
         string name;
         int ects_points;
         int mandatory;
     public:
-        string Get_id(){
-            return id;  
-        }
         void Set_professor(const Professor& newprofessor) {
             p = newprofessor;
         }
@@ -131,31 +128,33 @@ class Course{
 
 class Student: public Person{
     private:
-        vector<Course> Passed;
+        vector<Course*> Passed;
         vector<int> Passed_grade;
-        vector<Course> current_semester;
+        vector<Course*> current_semester;
         int ects;
         float average;
         int year;
     public:
         void stud_add_course(const Course& newCourse){
-            current_semester.push_back(newCourse);
+            Course* temp = new Course(newCourse);
+            current_semester.push_back(temp);
         }
         void stud_add_passed(const Course& newCourse, int x){
-            Passed.push_back(newCourse);
+            Course* temp = new Course(newCourse);
+            Passed.push_back(temp);
             Passed_grade.push_back(x);
         }
         void print_grades(){                //5.8
             cout << "Grades for courses passed by " << Get_name() << endl;
             for(int i = 0; i < Passed.size(); ++i) {
-                cout << "Course: " << Passed[i].Get_name() << ", Grade: " << Passed_grade[i] << endl;
+                cout << "Course: " << Passed[i]->Get_name() << ", Grade: " << Passed_grade[i] << endl;
             }
-        }
-        vector<Course>& Get_courses(){
-            return current_semester;
         }
         int Get_coursesize(){
             return current_semester.size();
+        }
+        vector<Course*> Get_courses(){
+            return current_semester;
         }
         int Get_ects(){
             return ects;
@@ -175,6 +174,8 @@ class Student: public Person{
         void Set_year(int x){
             year = x;
         }
+        Student(const string& n, const string& id, const string& p, int poects, float stuaver, int stuyear)
+        :Person(n, id, p), ects(poects), average(stuaver), year(stuyear){}
         Student(const Student& copied)
             : Person(copied), ects(copied.ects), average(copied.average), year(copied.year){}
         Student(const string& n, const string& id, const string& p)
@@ -192,39 +193,43 @@ class Semester{
         int size_course(){
             return courses.size();
         }
-        Course* search_course(const string& id){
-            for(size_t i = 0; i < courses.size(); ++i){
-                if(courses[i].Get_id() == name){
-                    return courses[i];
+        Course* search_name_course(const string& name){
+            for(int i = 0; i < courses.size(); ++i){
+                Course *temp = courses[i];
+                string c = temp->Get_name();
+                if(c == name){
+                    return temp;
                 }
             }
             throw out_of_range("Course not found");
         }
         /*Semester(const vector<Course>& initialCourses)
         : courses(initialCourses){}*/
-        vector<Course>& Get_courses(){
+        vector<Course*> Get_courses(){
             return courses;
         }
+        
         Semester(){}
         void Add_course(const Course& newCourse){
-            courses.push_back(newCourse);
+            Course* temp = new Course(newCourse);
+            courses.push_back(temp);
+            return;
         }
         void Remove_course(const string& rmname){
-            for (auto it = courses.begin(); it != courses.end();){      //go through the vector and find the course based on name
-                if (it->Get_name() == rmname) {
-                    it = courses.erase(it);  // erase returns the next valid iterator after the erased element
-                } else {
-                    ++it;
-                }
+            for(int i = 0; i < courses.size(); ++i){
+                string c = courses[i]->Get_name();
+                if(rmname == c){}
+                delete courses[i];
             }
         }
         //were in semester[i] whiuch we know the course is in and call this 
         //semester[1].Move_course("Intro", semester[2]);
         void Move_course(const string& mname, Semester& msem){ //ask for the origin of the course when cout
-            for(auto it = courses.begin(); it != courses.end(); ++it){
-                if (it->Get_name() == mname){
-                    msem.Add_course(*it);
-                    courses.erase(it);
+            for(int i = 0; i < courses.size(); ++i){
+                string c = courses[i]->Get_name();
+                if (c == mname){
+                    msem.Add_course(*courses[i]);
+                    delete courses[i];
                     return;  // exit the function after the move
                 }
                 else{
@@ -320,7 +325,7 @@ class Secretary{
             for (auto it1 = semesters.begin(); it1 != semesters.end(); ++it1){
                 Semester* tsem = *it1;
                 for (auto it2 = tsem->Get_courses().begin(); it2 != tsem->Get_courses().end(); ++it2) {
-                    Course* temp = &(*it2);
+                    Course* temp = (*it2);
                     string c = temp->Get_name();
                     if (name == c) { // if the names match, you found the course
                         it2 = tsem->Get_courses().erase(it2); // Erase the element from the vector
@@ -329,7 +334,7 @@ class Secretary{
                     }
                 }
             }
-            cout<<"The s you want to delete doesnt exist."<<endl;
+            cout<<"The course you want to delete doesnt exist."<<endl;
             return *this;
         }
         Secretary& Delete_prof(const string& id){
@@ -426,7 +431,6 @@ class Secretary{
 int Person::count = 0;                                      //initialise the count
 
 
-
 void stud(Secretary &secretary){
     string input;    
     cout << "Please provide your University ID." << endl;
@@ -469,12 +473,12 @@ void stud(Secretary &secretary){
                     cin >> ws;  //skip whitespaces
                     getline(cin, choicec5);                                                             
                     try{
-                        Course& modify = checksem->search_course(choicec5);
-                        cout << "Found course: " << modify.Get_name() << endl;
-                        s->stud_add_course(modify);
-                        vector<Course> markcour = s->Get_courses();
+                        Course* modify = checksem->search_name_course(choicec5);
+                        cout << "Found course: " << modify->Get_name() << endl;
+                        s->stud_add_course(*modify);
+                        vector<Course*> markcour = s->Get_courses();
                         int i = s->Get_coursesize();
-                        cout<<"You have been enrolled to: "<< markcour[i].Get_name()<<endl;
+                        cout<<"You have been enrolled to: "<< markcour[i]->Get_name()<<endl;
                     }
                     catch(const out_of_range& ex){
                         cout << "Error: could not find the course" << endl<<endl;
@@ -580,7 +584,7 @@ void employee(Secretary& secretary){
                 cout << "Provide the Professors University ID." << endl;
                 string prof;
                 cin >> prof;
-                Student* s;
+                Professor* s;
                 s = secretary.search_id_prof(prof);   //search for the student id and if it exists we have the data already in here
                 if(!s){
                     cout << "The University ID you have entered doesnt exist." << endl;
@@ -594,17 +598,20 @@ void employee(Secretary& secretary){
                     string name;
                     cout << "Give the professors name."<< endl;
                     cin >> name;
+                    string id;
+                    cout << "Give the professors id."<< endl;
+                    cin>>id;
                     string pass;
                     cout << "Give the password." << endl;
                     cin >> pass;
-                    Professor* newprof = new Professor( name, pass);
+                    Professor newprof( name, id, pass);
                     secretary = secretary + newprof;
                 }
                 else if(pchoice == 2){
                     cout << "Provide the Professors University ID." << endl;
                     string prof;
                     cin >> prof;
-                    Student* s;
+                    Professor* s;
                     s = secretary.search_id_prof(prof);   //search for the student id and if it exists we have the data already in here
                     if(!s){
                         cout << "The University ID you have entered doesnt exist." << endl;
@@ -618,7 +625,7 @@ void employee(Secretary& secretary){
                             string na;
                             cout << "Provide new name." << endl;
                             cin >> na;
-                            s->Set_username(na);
+                            s->Set_name(na);
                         }
                         if(edit == 2){
                             string na;
@@ -640,7 +647,7 @@ void employee(Secretary& secretary){
                     }
                     if(s->Get_id() == prof){
                         cout << "ID found." << endl;
-                        delete *s;
+                        delete s;
                     }
                 }
             }
@@ -652,12 +659,12 @@ void employee(Secretary& secretary){
                 string stu;
                 cin >> stu;
                 Student* s;
-                s = secretary.search_id_stud(id);   //search for the student id and if it exists we have the data already in here
+                s = secretary.search_id_stud(stu);   //search for the student id and if it exists we have the data already in here
                 if(!s){
                     cout << "The University ID you have entered doesnt exist." << endl;
                     return;
                 }
-                if(s->Get_id() == id){
+                if(s->Get_id() == stu){
                     cout << "ID found." << endl;
                 }
                 
@@ -671,9 +678,6 @@ void employee(Secretary& secretary){
                     string id;
                     cout << "Give the Univerisity ID." << endl;
                     cin >> id;
-                    string ocu;
-                    cout << "Give the occupation." << endl;
-                    cin >> ocu;
                     int ye;
                     cout << "Give the year theyre in." << endl;
                     cin >> ye;
@@ -683,8 +687,8 @@ void employee(Secretary& secretary){
                     int points;
                     cout << "Give the amount of points." << endl;
                     cin >> points;
-                    Student* newprof = new Student( name, id, ocu, ye, ave, pass, points);
-                    secretary = secretary + newprof
+                    Student newprof( name, id, pass, points, ave, ye);
+                    secretary = secretary + newprof;
                 }
                 else if(pchoice == 2){
                     cout << "Provide the Students University ID." << endl;
@@ -722,7 +726,7 @@ void employee(Secretary& secretary){
                             int na;
                             cout << "Provide new points." << endl;
                             cin >> na;
-                            s->Set_points(na);
+                            s->Set_ects(na);
                         }
                     }
                 }
@@ -738,7 +742,7 @@ void employee(Secretary& secretary){
                     }
                     if(s->Get_id() == prof){
                         cout << "ID found." << endl;
-                        delete *s;
+                        delete s;
                     }
                 }
             }
@@ -754,7 +758,7 @@ void employee(Secretary& secretary){
             cout<<"Press 1 if you want to edit professor related data." << endl << "Press 2 if you want to edit student related data." << endl << "Press 3 if you want to edit semester data." << endl << "Press 4 to logout." << endl;
             cin >> choice;
         }
-        return 0;
+        return;
     }
     cout << "Wrong password." << endl;
     return;
@@ -762,16 +766,12 @@ void employee(Secretary& secretary){
 
 
 
-
-
-
-
 int main(){
     static Secretary secretary;
     //THIS COMMENTED AREA IS THE PROOF OF WORK FOR 5.1,5.2,5.3,5.5,5.8
     //IN CASE OF A CHECK FOR THE PROOF COMMENT THE MENU FOR IT WORK
-    //5.1
-    /*cout<<"Number of professors: "<<secretary.professors_size()<<endl;         //prove professors is empty
+/*    //5.1
+    cout<<"Number of professors: "<<secretary.professors_size()<<endl;         //prove professors is empty
     string nameprof = "Eleni";
     string idprof = "sdi1";
     string passprof = "ilikebike";
@@ -825,18 +825,18 @@ int main(){
     cout<<"Number of semesters: "<<secretary.semesters_size()<<endl;//prove semester is added to sec
     Semester* checksem = secretary.Get_semester(1);
     cout<<"Courses in first semester: "<<checksem->size_course()<<endl;     //prove we can add courses to a semester
-    vector<Course> L = checksem->Get_courses();                               //prove it is inside the vector courses of the semester
-    cout<<"In the vector of Courses the name is: "<<L[0].Get_name()<<endl;
+    vector<Course*> L = checksem->Get_courses();                               //prove it is inside the vector courses of the semester
+    cout<<"In the vector of Courses the name is: "<<L[0]->Get_name()<<endl;
     try{                                                               //prove i can modify a course inside a semester
-        Course& modify = checksem->search_course("Intro to Programming");
-        cout << "Found course: " << modify.Get_name() << endl;
+        Course* modify = checksem->search_name_course("Intro to Programming");
+        cout << "Found course: " << modify->Get_name() << endl;
         string newnamecourse = "John";
         string newidcourse = "sdi54";
         string newpasscourse = "INeedToMakeTheMenuTooButThisIsJustDemonstratingItWorks";
         Professor john(newnamecourse, newidcourse, newpasscourse);
-        modify.Set_professor(john);
-        vector<Course> check = first.Get_courses();
-        Professor testcourse = check[0].Get_professor();
+        modify->Set_professor(john);
+        vector<Course*> check = first.Get_courses();
+        Professor testcourse = check[0]->Get_professor();
         cout <<"New name of professor: "<<testcourse.Get_name()<<endl;
     } 
     catch(const out_of_range){
@@ -859,11 +859,11 @@ int main(){
         getline(cin, choicec5);
         if(sc5 == 1){//also will do for the rest                                                               
             try{
-                Course& modify = checksem->search_course(choicec5);
-                cout << "Found course: " << modify.Get_name() << endl;
-                mark.stud_add_course(modify);
-                vector<Course> markcour = mark.Get_courses();
-                cout<<"Mark has been enrolled to: "<< markcour[0].Get_name()<<endl;
+                Course* modify = checksem->search_name_course(choicec5);
+                cout << "Found course: " << modify->Get_name() << endl;
+                mark.stud_add_course(*modify);
+                vector<Course*> markcour = mark.Get_courses();
+                cout<<"Mark has been enrolled to: "<< markcour[0]->Get_name()<<endl;
             }
             catch(const out_of_range& ex){
                 cout << "Error: could not find the course" << endl;
@@ -871,14 +871,7 @@ int main(){
             
         } 
     }
-
-    //5.8
-    mark.stud_add_passed(intro , 9);
-    mark.print_grades();
-
 */
-    //now for the menu requested in 5
-    //first we initialise some data
     string nameprof = "Eleni";
     string idprof = "sdiEleni1";
     string passwordprof = "HopeIPass";

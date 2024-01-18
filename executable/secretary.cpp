@@ -130,7 +130,10 @@ class Student: public Person{
         float average;
         int year;
     public:
-        Course& Get_courses(){
+        void stud_add_course(const Course& newCourse){
+            current_semester.push_back(newCourse);
+        }
+        vector<Course>& Get_courses(){
             return current_semester;
         }
         int Get_ects(){
@@ -232,6 +235,9 @@ class Secretary{
         vector<Employee*> employees;
         vector<Semester*> semesters;
     public:
+        Semester* Get_semester(int i){
+            return semesters[i-1];      //cause its the first but it is in pos 0 in vec
+        }
         int sem_size(){
             int total_courses = 0;
             for (const auto& semester : semesters) {
@@ -333,6 +339,12 @@ class Secretary{
         Secretary& operator+(Professor& prof){                    //overload the += operator to add a person with dynamic memory allocation (2.2)
             Professor* temp = new Professor(prof);                               //make a temp of the values you need and got via the main or function call
             professors.push_back(temp);                            //put the person inside the vector
+            //cout<<"prof:"<<professors.size()<<endl;
+            return *this;
+        }
+        Secretary& operator+(Semester& s){                    //overload the += operator to add a person with dynamic memory allocation (2.2)
+            Semester* temp = new Semester(s);                               //make a temp of the values you need and got via the main or function call
+            semesters.push_back(temp);                            //put the person inside the vector
             //cout<<"prof:"<<professors.size()<<endl;
             return *this;
         }
@@ -454,11 +466,16 @@ int main(){
     Course intro(eleni,namecourse, ectscourse,man);
     vector<Course*> firstcourses;
     firstcourses.push_back(&intro);
-    Semester first;
+    Semester first; //initialise the semester
     first.Add_course(intro);
-    cout<<"Courses in first semester: "<<first.size_course()<<endl;     //prove we can add courses to a semester
+    secretary = secretary + first;
+    cout<<"Number of semesters: "<<secretary.semesters_size()<<endl;//prove semester is added to sec
+    Semester* checksem = secretary.Get_semester(1);
+    cout<<"Courses in first semester: "<<checksem->size_course()<<endl;     //prove we can add courses to a semester
+    vector<Course> L = checksem->Get_courses();                               //prove it is inside the vector courses of the semester
+    cout<<"In the vector of Courses the name is: "<<L[0].Get_name()<<endl;
     try{                                                               //prove i can modify a course inside a semester
-        Course& modify = first.search_course("Intro to Programming");
+        Course& modify = checksem->search_course("Intro to Programming");
         cout << "Found course: " << modify.Get_name() << endl;
         string newnamecourse = "John";
         string newidcourse = "sdi54";
@@ -479,19 +496,26 @@ int main(){
     string pass5 = "immark";
     Student mark(name5, id5, pass5);
     mark.Set_year(5);
-    string namec5;
     cout<<"Enter the semester you want to choose:"<<endl;
     int sc5;
     cin>> sc5;
-    if(sc5/2 >= sc5){
-        cout<<"Enter the course you want to choose: "<<endl;
+    if(sc5/2 <= mark.Get_year()){
+        cout << "Enter the course you want to choose: " << endl;
         string choicec5;
-        cin>>choicec5;
+        cin >> ws;  //skip whitespaces
+        getline(cin, choicec5);
         if(sc5 == 1){//also will do for the rest                                                               
-            Course& modify = first.search_course(choicec5);
-            cout << "Found course: " << modify.Get_name() << endl;
-            Student checkmark = mark.Get_courses();
-            checkmark.push_back(modify);
+            try{
+                Course& modify = checksem->search_course(choicec5);
+                cout << "Found course: " << modify.Get_name() << endl;
+                mark.stud_add_course(modify);
+                vector<Course> markcour = mark.Get_courses();
+                cout<<"Mark has been enrolled to: "<< markcour[0].Get_name()<<endl;
+            }
+            catch(const out_of_range& ex){
+                cout << "Error: could not find the course" << endl;
+            }
+            
         } 
     }
 //    vector<Course> check = mark.Get_courses();

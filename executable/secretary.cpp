@@ -114,6 +114,9 @@ class Course{
         void Set_mandatory(int x){
             mandatory = x;
         }
+        Course(){}
+        Course(const string& n, int epo, int mand)
+        :name(n), ects_points(epo), mandatory(mand){}
         Course( Professor& s,const string& n, int epo, int mand)
         :p(s),name(n), ects_points(epo), mandatory(mand){}
         Course(const Course& copied)
@@ -125,6 +128,7 @@ class Course{
 class Student: public Person{
     private:
         vector<Course> Passed;
+        vector<int> Passed_grade;
         vector<Course> current_semester;
         int ects;
         float average;
@@ -132,6 +136,16 @@ class Student: public Person{
     public:
         void stud_add_course(const Course& newCourse){
             current_semester.push_back(newCourse);
+        }
+        void stud_add_passed(const Course& newCourse, int x){
+            Passed.push_back(newCourse);
+            Passed_grade.push_back(x);
+        }
+        void print_grades(){                //5.8
+            cout << "Grades for courses passed by " << Get_name() << endl;
+            for(int i = 0; i < Passed.size(); ++i) {
+                cout << "Course: " << Passed[i].Get_name() << ", Grade: " << Passed_grade[i] << endl;
+            }
         }
         vector<Course>& Get_courses(){
             return current_semester;
@@ -348,14 +362,6 @@ class Secretary{
             //cout<<"prof:"<<professors.size()<<endl;
             return *this;
         }
-        bool search(Student target){                             //search for any person based on their university id (2.4)
-            for(int i = 0; i < students.size(); i++){
-                if(target.Get_id() == students[i]->Get_id()){     //if the ids match you found them
-                    return true;
-                }
-            }
-            return false;                                       //if they dont then you didnt
-        }
         Employee* search_id_employee(const string& id){              //search for any person based on their university id but with only their sdi as input
             for(int i = 0; i < employees.size(); i++){             //instead of working with strings i just
                 Employee *temp = employees[i];
@@ -414,11 +420,296 @@ int Person::count = 0;                                      //initialise the cou
 
 
 
+void stud(Secretary &secretary){
+    string input;    
+    cout << "Please provide your University ID." << endl;
+    cin >> input;
+    Student* s;
+    s = secretary.search_id_stud(input);   //search for the student id and if it exists we have the data already in here
+    if(!s){
+        cout << "The University ID you have entered doesnt exist." << endl;
+        return;
+    }
+    if(s->Get_id() == input){
+        cout << "ID found." << endl;
+    }
+    cout << "Enter password." << endl;
+    string pass;
+    cin >> pass;
+    cout << endl;
+    if(pass == s->Get_password()){
+        cout << "Login successful." << endl<<endl;
+        cout << "Press 1 to show total average."<<endl<<"Press 2 to show your ECTS points."<<endl<<"Press 3 to sign up for a course."<<endl<<"Press 4 to change password."<<endl<<"Press 5 to logout." << endl<<endl;
+        int choice;
+        cin >> choice;
+        while(choice != 5){
+            if(choice == 1){
+                float av = s->Get_average();
+                cout << "Your average is: " << av <<endl<<endl;
+            }
+            else if(choice == 2){
+                int epoints = s->Get_ects();
+                cout << "Your ECTS points are: "<< epoints << endl<<endl;
+            }
+            else if(choice == 3){
+                cout << "Input the name of the course you want to enroll in "<<endl;
+                string enrollcourse;
+                cin>>enrollcourse;
+            }
+            else if(choice == 4){
+                string newp;
+                cout << endl << "Type your new password." << endl;
+                cin >> newp;
+                cout<<"Confirm the password reset by typing 1"<<endl;
+                int con;
+                cin >> con;
+                if(con == 1){
+                    s->Set_password(newp);
+                    cout<<"Password changed successfully."<<endl<<endl;
+                }
+            }
+            cout << "Press 1 to show your grades for this semester."<<endl<<"Press 2 to show total average."<<endl<<"Press 3 to show your ECTS points."<<endl<<"Press 4 to sign up for a course."<<endl<<"Press 5 to change your password."<<endl<<"Press 6 to logout" << endl<<endl;
+            cin >> choice;
+        }
+    }
+    else{
+        cout << "Wrong password. Try again" << endl;
+    }
+}
+
+void teach(Secretary &secretary){
+    string input;    
+    cout << "Please provide your University ID." << endl;
+    cin >> input;
+    Professor* s;
+    s = secretary.search_id_prof(input);   //search for the student id and if it exists we have the data already in here
+    if(s == nullptr){
+        cout << "The University ID you have entered doesnt exist." << endl;
+        return;
+    }
+    if(input == s->Get_name()){
+        cout << "ID found." << endl;
+    }
+    cout << "Enter password." << endl;
+    string pass;
+    cin >> pass;
+    cout << endl;
+    if(pass == s->Get_password()){
+        cout << "Login successful." << endl<<endl;
+        cout << "Press 1 to show semester statistics."<<endl<<"Press 2 to change password."<<endl<<"Press 3 to logout." << endl<<endl;
+        int choice;
+        cin >> choice;
+        while(choice != 3){
+            if(choice == 1){
+                
+            }
+            else if(choice == 2){
+                string newp;
+                cout << endl << "Type your new password." << endl;
+                cin >> newp;
+                cout<<"Confirm the password reset by typing 1"<<endl;
+                int con;
+                cin >> con;
+                if(con == 1){
+                    s->Set_password(newp);
+                    cout<<"Password changed successfully."<<endl<<endl;
+                }
+            }
+            cout << "Press 1 to show semester statistics."<<endl<<"Press 2 to change password."<<endl<<"Press 3 to logout." << endl<<endl;
+            cin >> choice;
+        }
+
+    }
+}
+/*
+void employee(Secretary& secretary){
+    cout<<"Give the employee password."<<endl;
+    string pass;
+    cin >> pass;
+    if(cin == secretary.Get_password()){
+        cout<<"Press 1 if you want to edit professor related data." << endl << "Press 2 if you want to edit student related data." << endl << "Press 3 if you want to edit semester data." << endl << "Press 4 to logout." << endl;
+        int choice;
+        cin >> choice;
+        while(choice != 4){      
+            if(choice == 1){
+                cout << "Press 1 if you want to add a professor, 2 if you want to edit one, 3 if you want to delete one." << endl;
+                int pchoice;
+                cin >> pchoice;
+                cout << "Provide the Professors University ID." << endl;
+                string prof;
+                cin >> prof;
+                Student* s;
+                s = secretary.search_id_prof(prof);   //search for the student id and if it exists we have the data already in here
+                if(!s){
+                    cout << "The University ID you have entered doesnt exist." << endl;
+                    return;
+                }
+                if(s->Get_id() == prof){
+                    cout << "ID found." << endl;
+                }
+                
+                if(pchoice == 1){
+                    string name;
+                    cout << "Give the professors name."<< endl;
+                    cin >> name;
+                    string pass;
+                    cout << "Give the password." << endl;
+                    cin >> pass;
+                    Professor* newprof = new Professor( name, pass);
+                }
+                else if(pchoice == 2){
+                    cout << "Provide the Professors University ID." << endl;
+                    string prof;
+                    cin >> prof;
+                    Student* s;
+                    s = secretary.search_id_prof(prof);   //search for the student id and if it exists we have the data already in here
+                    if(!s){
+                        cout << "The University ID you have entered doesnt exist." << endl;
+                    }
+                    if(s->Get_id() == prof){
+                        cout << "ID found." << endl;
+                        cout<< "Press 1 if you want to edit the username or 2 if you want to edit the password" << endl;
+                        int edit;
+                        cin >> edit;
+                        if(edit == 1){
+                            string na;
+                            cout << "Provide new name." << endl;
+                            cin >> na;
+                            s->Set_username(na);
+                        }
+                        if(edit == 2){
+                            string na;
+                            cout << "Provide new password." << endl;
+                            cin >> na;
+                            s->Set_password(na);
+                        }
+                    }
+                }
+                else if(pchoice == 3){
+                    cout << "Provide the Professors University ID." << endl;
+                    string prof;
+                    cin >> prof;
+                    Student* s;
+                    s = secretary.search_id_prof(prof);   //search for the student id and if it exists we have the data already in here
+                    if(!s){
+                        cout << "The University ID you have entered doesnt exist." << endl;
+                        return;
+                    }
+                    if(s->Get_id() == prof){
+                        cout << "ID found." << endl;
+                        delete *s;
+                    }
+                }
+            }
+            else if(choice == 2){
+                cout << "Press 1 if you want to add a student, 2 if you want to edit one, 3 if you want to delete one." << endl;
+                int pchoice;
+                cin >> pchoice;
+                cout << "Provide the Students University ID." << endl;
+                string stu;
+                cin >> stu;
+                Student* s;
+                s = secretary.search_id_stud(id);   //search for the student id and if it exists we have the data already in here
+                if(!s){
+                    cout << "The University ID you have entered doesnt exist." << endl;
+                    return;
+                }
+                if(s->Get_id() == id){
+                    cout << "ID found." << endl;
+                }
+                
+                if(pchoice == 1){
+                    string name;
+                    cout << "Give the students name."<< endl;
+                    cin >> name;
+                    string pass;
+                    cout << "Give the password." << endl;
+                    cin >> pass;
+                    string id;
+                    cout << "Give the Univerisity ID." << endl;
+                    cin >> id;
+                    string ocu;
+                    cout << "Give the occupation." << endl;
+                    cin >> ocu;
+                    int ye;
+                    cout << "Give the year theyre in." << endl;
+                    cin >> ye;
+                    float ave;
+                    cout << "Give the average." << endl;
+                    cin >> ave;
+                    int points;
+                    cout << "Give the amount of points." << endl;
+                    cin >> points;
+                    Student* newprof = new Student( name, id, ocu, ye, ave, pass, points);
+                }
+                else if(pchoice == 2){
+                    cout << "Provide the Students University ID." << endl;
+                    string stu;
+                    cin >> stu;
+                    Student* s;
+                    s = secretary.search_id_stud(stu);   //search for the student id and if it exists we have the data already in here
+                    if(!s){
+                        cout << "The University ID you have entered doesnt exist." << endl;
+                    }
+                    if(s->Get_id() == stu){
+                        cout << "ID found." << endl;
+                        cout<< "Press 1 if you want to edit the name."<< endl<<"Press 2 if you want to edit the average." << endl<<"Press 3 if you want to edit the password." << endl<<"Press 4 if you want to edit the points." << endl;
+                        int edit;
+                        cin >> edit;
+                        if(edit == 1){
+                            string na;
+                            cout << "Provide new name." << endl;
+                            cin >> na;
+                            s->Set_name(na);
+                        }
+                        else if(edit == 2){
+                            float na;
+                            cout << "Provide new average." << endl;
+                            cin >> na;
+                            s->Set_average(na);
+                        }
+                        else if(edit == 3){
+                            string na;
+                            cout << "Provide new password." << endl;
+                            cin >> na;
+                            s->Set_password(na);
+                        }
+                        else if(edit == 4){
+                            int na;
+                            cout << "Provide new points." << endl;
+                            cin >> na;
+                            s->Set_points(na);
+                        }
+                    }
+                }
+                else if(pchoice == 3){
+                    //course
+                }
+            }
+            else if(choice == 3){
+
+            }
+            cout<<"Press 1 if you want to edit professor related data." << endl << "Press 2 if you want to edit student related data." << endl << "Press 3 if you want to edit semester data." << endl << "Press 4 to logout." << endl;
+            cin >> choice;
+        }
+        return 0;
+    }
+    cout << "Wrong password." << endl;
+    return;
+}
+*/
+
+
+
+
+
+
 int main(){
     static Secretary secretary;
-
+    //THIS COMMENTED AREA IS THE PROOF OF WORK FOR 5.1,5.2,5.3,5.5,5.8
+    //IN CASE OF A CHECK FOR THE PROOF COMMENT THE MENU FOR IT WORK
     //5.1
-    cout<<"Number of professors: "<<secretary.professors_size()<<endl;         //prove professors is empty
+    /*cout<<"Number of professors: "<<secretary.professors_size()<<endl;         //prove professors is empty
     string nameprof = "Eleni";
     string idprof = "sdi1";
     string passprof = "ilikebike";
@@ -437,7 +728,7 @@ int main(){
     secretary.Delete_prof(idprof);              //prove i can delete a student given his uni id
     cout<<"Number of professors: "<<secretary.professors_size()<<endl;
 
-/*
+
     //5.2
     cout<<"Number of students: "<<secretary.studs_size()<<endl;         //prove students is empty
     string nstud = "Themistoklis";
@@ -457,7 +748,7 @@ int main(){
     cout<<searchstud->Get_name()<<endl;
     secretary.Delete_stud(idstud);              //prove i can delete a student given his uni id
     cout<<"Number of students: "<<secretary.studs_size()<<endl;
-*/
+
     //5.3
     cout<<"Number of semesters: "<<secretary.semesters_size()<<endl;         //prove semestersents is empty
     string namecourse = "Intro to Programming";
@@ -518,6 +809,54 @@ int main(){
             
         } 
     }
-//    vector<Course> check = mark.Get_courses();
+
+    //5.8
+    mark.stud_add_passed(intro , 9);
+    mark.print_grades();
+
+*/
+    //now for the menu requested in 5
+    //first we initialise some data
+    string nameprof = "Eleni";
+    string idprof = "sdiEleni1";
+    string passwordprof = "HopeIPass";
+    Professor prof1(nameprof, idprof, passwordprof);
+    secretary = secretary + prof1;
+    string nameprof2 = "Eleni2";
+    string idprof2 = "sdiEleni2";
+    string passwordprof2 = "HopeIPass2";
+    Professor prof2(nameprof2, idprof2, passwordprof2);
+    secretary = secretary + prof2;
+    string namecourse = "Intro";
+    int pointcourse = 7;
+    int mandcourse = 1;
+    Course intro(prof1,namecourse,pointcourse, mandcourse);
+    namecourse = "Datastructs";
+    pointcourse = 7;
+    mandcourse = 1;
+    Course datastructs(prof2,namecourse, pointcourse, mandcourse);
+    Semester first;
+    secretary = secretary + first;
+    Semester second;
+    secretary = secretary + second;
+    string namestud = "Themis";
+    string idstud = "sdi2000071";
+    string passwordstud = "Itriedmybest";
+    Student me(namestud, idstud, passwordstud);
+    me.Set_average(12456789);
+    secretary = secretary + me;
+    first.Add_course(intro);
+    second.Add_course(datastructs);
+    cout << "\n\nMyStudy Menu:\nPress 1 if Student, 2 if Professor, 3 if Secretary." << endl;
+    int path;
+    cin >> path;
+    if(path == 1){  //use exception here and on the others
+        stud(secretary);
+        return 0;
+    }
+    if(path == 2){
+        teach(secretary);
+        return 0;
+    }
     return 0;
 }

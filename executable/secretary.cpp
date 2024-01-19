@@ -269,6 +269,22 @@ class Secretary{
                 }
             }
         }
+        void remove_course_sec(const string& mname, int base){ //ask for the origin of the course when cout
+            vector<Course*>* basesem = semesters[base - 1]->Get_courses();
+            for(int i = 0; i < basesem->size(); ++i){
+                string c = (*basesem)[i]->Get_name();
+                if (c == mname){
+                    delete (*basesem)[i];
+                    basesem->erase(basesem->begin() + i);
+                    return;  // exit the function after the move
+                }
+                else{
+                    // Handle invalid destination semester
+                    cout << "Invalid base semester or name.\n";
+                    return;  // exit the function since no valid move is performed
+                }
+            }
+        }
         Semester* Get_semester(int i){
             return semesters[i-1];      //cause its the first but it is in pos 0 in vec
         }
@@ -750,15 +766,32 @@ void employee(Secretary& secretary){
                 int pchoice;
                 cin >> pchoice;
                 while(pchoice != 5){
-                    cout << "Provide the Courses name." << endl;
-                    string cou;
-                    cin >> cou;
-                    int cousem;
-                    cout<<"Provide the Semester its in."<<endl;
-                    cin>>cousem;
-                    Semester* checksem = secretary.Get_semester(cousem);
-                    Course* modify = checksem->search_name_course(cou);
-                    if(pchoice == 2 | pchoice == 3 | pchoice == 4){
+                    if(pchoice == 1){
+                        int cousem;
+                        cout<<"Provide the Semester its going to be in."<<endl;
+                        cin>>cousem;
+                        Semester* checksem = secretary.Get_semester(cousem);
+                        cout<<"Give the name."<<endl;
+                        string nam1;
+                        cin>>nam1;
+                        cout<<"Give the points."<<endl;
+                        int p1;
+                        cin>>p1;
+                        cout<<"Give the mandatory status."<<endl;
+                        int man1;
+                        cin>>man1;
+                        Course newc1(nam1,p1,man1);
+                        checksem->Add_course(newc1);
+                    }
+                    if(pchoice == 2){
+                        cout << "Provide the Courses name." << endl;
+                        string cou;
+                        cin >> cou;
+                        int cousem;
+                        cout<<"Provide the Semester its in."<<endl;
+                        cin>>cousem;
+                        Semester* checksem = secretary.Get_semester(cousem);
+                        Course* modify = checksem->search_name_course(cou);
                         try{                                                               //prove i can modify a course inside a semester
                             Course* modify = checksem->search_name_course(cou);
                             cout << "Found course: " << modify->Get_name() << endl;
@@ -805,7 +838,13 @@ void employee(Secretary& secretary){
                         }
                     }
                     if(pchoice == 3){
-
+                        cout << "Provide the Courses name." << endl;
+                        string cou;
+                        cin >> cou;
+                        int cousem;
+                        cout<<"Provide the Semester its in."<<endl;
+                        cin>>cousem;
+                        secretary.remove_course_sec(cou, cousem);
                     }
                     cout << "Press 1 if you want to add a course, 2 if you want to edit one, 3 if you want to delete one. Press 4 to logout." << endl;
                     cin>>pchoice;

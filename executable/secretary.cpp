@@ -743,13 +743,61 @@ void employee(Secretary& secretary){
                 }
             }
             else if(choice == 3){
-                cout << "Press 1 if you want to add a course, 2 if you want to edit one, 3 if you want to delete one." << endl;
+                cout << "Press 1 if you want to add a course, 2 if you want to edit one, 3 if you want to delete one. Press 4 to logout." << endl;
                 int pchoice;
                 cin >> pchoice;
-                cout << "Provide the Courses name." << endl;
-                string stu;
-                cin >> stu;
-                Student* s;
+                while(pchoice != 4){
+                    cout << "Provide the Courses name." << endl;
+                    string cou;
+                    cin >> cou;
+                    int cousem;
+                    cout<<"Provide the Semester its in."<<endl;
+                    cin>>cousem;
+                    Semester* checksem = secretary.Get_semester(cousem);
+                    Course* modify = checksem->search_name_course(cou);
+                    if(pchoice == 2 | pchoice == 3){
+                        try{                                                               //prove i can modify a course inside a semester
+                            Course* modify = checksem->search_name_course(cou);
+                            cout << "Found course: " << modify->Get_name() << endl;
+                        } 
+                        catch(const out_of_range){
+                            cout << "Course not found." << endl;
+                        }
+                        if(pchoice == 2){
+                            cout<<"Press 1 to modify the courses name, 2 to modify the courses ects points, 3 to set a professor."<<endl;
+                            int couchoice;
+                            cin>>couchoice;
+                            if(couchoice == 1){
+                                cout<<"Give the new name."<<endl;
+                                string counewname;
+                                cin>> counewname;
+                                modify->Set_name(counewname);
+                            }
+                            if(couchoice == 2){
+                                cout<<"Give the new points."<<endl;
+                                int counewects;
+                                cin>> counewects;
+                                modify->Set_ects(counewects);
+                            }
+                            if(couchoice == 3){     //5.4
+                                cout<<"Give the new professors name."<<endl;
+                                string counewname;
+                                cin>> counewname;
+                                cout<<"Give new professors id."<<endl;
+                                string newid;
+                                cin>>newid;
+                                string newpass;
+                                Professor* prof = new Professor()
+                                modify->Set_professor(newprof);
+                            }
+                        }
+                    }
+                    if(pchoice == 3){
+
+                    }
+                    cout << "Press 1 if you want to add a course, 2 if you want to edit one, 3 if you want to delete one. Press 4 to logout." << endl;
+                    cin>>pchoice;
+                }
             }
             cout<<"Press 1 if you want to edit professor related data." << endl << "Press 2 if you want to edit student related data." << endl << "Press 3 if you want to edit semester data." << endl << "Press 4 to logout." << endl;
             cin >> choice;

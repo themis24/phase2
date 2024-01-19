@@ -68,19 +68,35 @@ class Person{
         }
 };
 
-
 class Course;
 
 class Professor: public Person{
     private:
-        vector<Course*> current_semester;
+        Course* current;
+        int sem;
     public:
-
+        void Set_sem(int x){
+            sem = x;
+        }
+        int Get_sem(){
+            return sem;
+        }
+        void Set_course(const Course& newCourse);
+        Course* Get_course(){
+            if(current != nullptr){
+                return current;
+            }
+            else{return nullptr;}
+        }
         Professor(const string& n, const string& id, const string& p)
-        :Person(n, id, p){}
-        Professor(){}
+        :Person(n, id, p){current = nullptr;}
+        Professor(){current = nullptr;}
         Professor(const Professor& copied)
-        :Person(copied), current_semester(copied.current_semester){}
+        :Person(copied){
+            if(copied.current){
+                current = copied.current;
+            }
+        }
         ~Professor(){
 
         }
@@ -127,7 +143,9 @@ class Course{
         {}
         ~Course(){}
 };
-
+void Professor::Set_course(const Course& newCourse){
+    Course* current = new Course(newCourse);
+}
 class Student: public Person{
     private:
         vector<Course*> Passed;
@@ -918,6 +936,25 @@ void employee(Secretary& secretary){
 }
 
 
+void writeProfessorsToFile( Secretary& secretary, const string& filename) {
+    ofstream outputFile(filename);
+
+    if (!outputFile.is_open()) {
+        cerr << "Error opening file for writing: " << filename << endl;
+        return;
+    }
+
+    // Iterate over professors and write their information to the file
+    for(int j = 0; j < secretary.professors_size(); j++){
+        Professor* p = secretary.Get_prof(j);
+        Course* printcour = p->Get_course();//its this mfer right here
+    
+        outputFile << p->Get_name() << " " << p->Get_id() << " " << p->Get_password() << " " << p->Get_sem() << " " << printcour->Get_name()<< " " << printcour->Get_ects()<<" "<< printcour->Get_mandatory() << endl;
+    }
+    outputFile.close();
+}
+
+
 
 int main(){
     static Secretary secretary;
@@ -1077,6 +1114,11 @@ int main(){
     second.Add_course(physics);
     secretary = secretary + second;
 */
+    string nameprof = "Eleni";
+    string idprof = "sdiEleni1";
+    string passwordprof = "HopeIPass";
+    Employee emp(nameprof,idprof,passwordprof);
+    secretary = secretary + emp;
     Semester first;
     Semester second;            //only two semesters so that we can be more simple
     ifstream inputFile("profcourses.txt");
@@ -1099,8 +1141,12 @@ int main(){
         Course tempc(temp, course, ects, mandatory);
         if(semester == 1){
             first.Add_course(tempc);
+            temp.Set_course(tempc);
+            temp.Set_sem(1);
         }
         else if(semester == 2){
+            temp.Set_course(tempc);
+            temp.Set_sem(2);
             second.Add_course(tempc);
         }
         secretary = secretary + temp;
@@ -1143,14 +1189,20 @@ int main(){
     cin >> path;
     if(path == 1){  //use exception here and on the others
         stud(secretary);
+        //writeProfessorsToFile(secretary, "profcourses.txt");
+        //writeStudentsToFile(secretary, "studs.txt");
         return 0;
     }
     if(path == 2){
         teach(secretary);
+        //writeProfessorsToFile(secretary, "profcourses.txt");
+        //writeStudentsToFile(secretary, "studs.txt");
         return 0;
     }
     if(path == 3){
         employee(secretary);
+        writeProfessorsToFile(secretary, "profcourses.txt");
+        //writeStudentsToFile(secretary, "studs.txt");
         return 0;
     }
     return 0;

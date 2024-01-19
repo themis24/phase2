@@ -491,7 +491,6 @@ void stud(Secretary &secretary){
                     catch(const out_of_range& ex){
                         cout << "Error: could not find the course" << endl<<endl;
                     }
-                        
                 }
             }
             else if(choice == 4){
@@ -616,31 +615,20 @@ void employee(Secretary& secretary){
                     secretary = secretary + newprof;
                 }
                 else if(pchoice == 2){
-                    cout << "Provide the Professors University ID." << endl;
-                    string prof;
-                    cin >> prof;
-                    Professor* s;
-                    s = secretary.search_id_prof(prof);   //search for the student id and if it exists we have the data already in here
-                    if(!s){
-                        cout << "The University ID you have entered doesnt exist." << endl;
+                    cout<< "Press 1 if you want to edit the username or 2 if you want to edit the password" << endl;
+                    int edit;
+                    cin >> edit;
+                    if(edit == 1){
+                        string na;
+                        cout << "Provide new name." << endl;
+                        cin >> na;
+                        s->Set_name(na);
                     }
-                    if(s->Get_id() == prof){
-                        cout << "ID found." << endl;
-                        cout<< "Press 1 if you want to edit the username or 2 if you want to edit the password" << endl;
-                        int edit;
-                        cin >> edit;
-                        if(edit == 1){
-                            string na;
-                            cout << "Provide new name." << endl;
-                            cin >> na;
-                            s->Set_name(na);
-                        }
-                        if(edit == 2){
-                            string na;
-                            cout << "Provide new password." << endl;
-                            cin >> na;
-                            s->Set_password(na);
-                        }
+                    if(edit == 2){
+                        string na;
+                        cout << "Provide new password." << endl;
+                        cin >> na;
+                        s->Set_password(na);
                     }
                 }
                 else if(pchoice == 3){
@@ -884,6 +872,8 @@ int main(){
     string idprof = "sdiEleni1";
     string passwordprof = "HopeIPass";
     Professor prof1(nameprof, idprof, passwordprof);
+    Employee emp(nameprof,idprof,passwordprof);
+    secretary = secretary + emp;
     secretary = secretary + prof1;
     string nameprof2 = "Eleni2";
     string idprof2 = "sdiEleni2";

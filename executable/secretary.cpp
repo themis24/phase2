@@ -135,6 +135,20 @@ class Student: public Person{
         float average;
         int year;
     public:
+        void check_passed_stud(const string& mname, int base){ //ask for the origin of the course when cout
+            for(int i = 0; i < Passed.size(); ++i){
+                string c = Passed[i]->Get_name();
+                if (c == mname){
+                    cout<<students[i].Get_name() <<" passed the course."<<endl;
+                    return;  // exit the function after the move
+                }
+                else{
+                    // Handle invalid destination semester
+                    cout << "Invalid destination semester.\n";
+                    return;  // exit the function since no valid move is performed
+                }
+            }
+        }
         void stud_add_course(const Course& newCourse){
             Course* temp = new Course(newCourse);
             current_semester.push_back(temp);
@@ -267,6 +281,11 @@ class Secretary{
                     cout << "Invalid destination semester.\n";
                     return;  // exit the function since no valid move is performed
                 }
+            }
+        }
+        void check_passed_sec(const string& mname, int base){ //ask for the origin of the course when cout
+            for(i = 0 ;i < students.size(); i++ ){
+                students[i].check_passed_stud(mname, base);
             }
         }
         void remove_course_sec(const string& mname, int base){ //ask for the origin of the course when cout
@@ -762,7 +781,7 @@ void employee(Secretary& secretary){
                 }
             }
             else if(choice == 3){
-                cout << "Press 1 if you want to add a course, 2 if you want to edit one, 3 if you want to delete one. Press 4 to logout." << endl;
+                cout << "Press 1 if you want to add a course, 2 if you want to edit one, 3 if you want to delete one. Press 4 to see who passed the course. Press 5 to logout." << endl;
                 int pchoice;
                 cin >> pchoice;
                 while(pchoice != 5){
@@ -846,7 +865,16 @@ void employee(Secretary& secretary){
                         cin>>cousem;
                         secretary.remove_course_sec(cou, cousem);
                     }
-                    cout << "Press 1 if you want to add a course, 2 if you want to edit one, 3 if you want to delete one. Press 4 to logout." << endl;
+                    if(pchoice == 4){
+                        cout << "Provide the Courses name." << endl;
+                        string cou;
+                        cin >> cou;
+                        int cousem;
+                        cout<<"Provide the Semester its in."<<endl;
+                        cin>>cousem;
+                        secretary.check_passed_sec(cou, cousem);            //5.6
+                    }
+                    cout << "Press 1 if you want to add a course, 2 if you want to edit one, 3 if you want to delete one, 4 to show who passed it. Press 5 to logout." << endl;
                     cin>>pchoice;
                 }
             }

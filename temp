@@ -9322,3 +9322,6 @@ int main(){
     }
     return 0;
 }
+
+
+ void Move_course(const string& mname, Semester& msem)

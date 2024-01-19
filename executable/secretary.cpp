@@ -214,7 +214,7 @@ class Semester{
             Course* temp = new Course(newCourse);
             courses.push_back(temp);
                 cout << "Course added to the semester: " << newCourse.Get_name() << endl;
-    cout << "Number of courses in the semester after adding: " << courses.size() << endl;
+                cout << "Number of courses in the semester after adding: " << courses.size() << endl;
 
             return;
         }
@@ -224,23 +224,6 @@ class Semester{
                 if(rmname == c){
                     delete courses[i];
                     courses.erase(courses.begin() + i);
-                }
-            }
-        }
-        //were in semester[i] whiuch we know the course is in and call this 
-        //semester[1].Move_course("Intro", semester[2]);
-        void Move_course(const string& mname, Semester& msem){ //ask for the origin of the course when cout
-            for(int i = 0; i < courses.size(); ++i){
-                string c = courses[i]->Get_name();
-                if (c == mname){
-                    msem.Add_course(*courses[i]);
-                    delete courses[i];
-                    return;  // exit the function after the move
-                }
-                else{
-                    // Handle invalid destination semester
-                    cout << "Invalid destination semester.\n";
-                    return;  // exit the function since no valid move is performed
                 }
             }
         }
@@ -266,6 +249,26 @@ class Secretary{
         vector<Employee*> employees;
         vector<Semester*> semesters;
     public:
+        //were in semester[i] whiuch we know the course is in and call this 
+        //semester[1].Move_course("Intro", semester[2]);
+        void Move_course(const string& mname, int base, int dest){ //ask for the origin of the course when cout
+            vector<Course*>* basesem = semesters[base - 1]->Get_courses();
+            Semester* destination = semesters[dest - 1];
+            for(int i = 0; i < basesem->size(); ++i){
+                string c = (*basesem)[i]->Get_name();
+                if (c == mname){
+                    destination->Add_course(*((*basesem)[i]));
+                    delete (*basesem)[i];
+                    basesem->erase(basesem->begin() + i);
+                    return;  // exit the function after the move
+                }
+                else{
+                    // Handle invalid destination semester
+                    cout << "Invalid destination semester.\n";
+                    return;  // exit the function since no valid move is performed
+                }
+            }
+        }
         Semester* Get_semester(int i){
             return semesters[i-1];      //cause its the first but it is in pos 0 in vec
         }
@@ -746,7 +749,7 @@ void employee(Secretary& secretary){
                 cout << "Press 1 if you want to add a course, 2 if you want to edit one, 3 if you want to delete one. Press 4 to logout." << endl;
                 int pchoice;
                 cin >> pchoice;
-                while(pchoice != 4){
+                while(pchoice != 5){
                     cout << "Provide the Courses name." << endl;
                     string cou;
                     cin >> cou;
@@ -755,7 +758,7 @@ void employee(Secretary& secretary){
                     cin>>cousem;
                     Semester* checksem = secretary.Get_semester(cousem);
                     Course* modify = checksem->search_name_course(cou);
-                    if(pchoice == 2 | pchoice == 3){
+                    if(pchoice == 2 | pchoice == 3 | pchoice == 4){
                         try{                                                               //prove i can modify a course inside a semester
                             Course* modify = checksem->search_name_course(cou);
                             cout << "Found course: " << modify->Get_name() << endl;
@@ -764,7 +767,7 @@ void employee(Secretary& secretary){
                             cout << "Course not found." << endl;
                         }
                         if(pchoice == 2){
-                            cout<<"Press 1 to modify the courses name, 2 to modify the courses ects points, 3 to set a professor."<<endl;
+                            cout<<"Press 1 to modify the courses name, 2 to modify the courses ects points, 3 to set a professor, 4 to move it to another semester."<<endl;
                             int couchoice;
                             cin>>couchoice;
                             if(couchoice == 1){
@@ -786,9 +789,18 @@ void employee(Secretary& secretary){
                                 cout<<"Give new professors id."<<endl;
                                 string newid;
                                 cin>>newid;
+                                cout<<"Give new password."<<endl;
                                 string newpass;
-                                Professor* prof = new Professor()
-                                modify->Set_professor(newprof);
+                                cin>>newpass;
+                                Professor prof(counewname, newid, newpass);
+                                modify->Set_professor(prof);
+                            }
+                            if(couchoice == 4){//move semesters 5.5
+                                cout<<"What semester would you like to move it to?"<<endl;
+                                int movesem;
+                                cin>>movesem;
+                                //Semester* checkmovesem = secretary.Get_semester(cousem);
+                                secretary.Move_course(cou, cousem,movesem);
                             }
                         }
                     }

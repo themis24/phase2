@@ -197,7 +197,6 @@ class Semester{
             for(int i = 0; i < courses.size(); i++){
                 Course *temp = courses[i];
                 string c = temp->Get_name();
-                cout<<"IN SEARCH"<<c<<endl;
                 if(c == name){
                     return temp;
                 }
@@ -485,7 +484,9 @@ void stud(Secretary &secretary){
                         s->stud_add_course(*modify);
                         vector<Course*> markcour = s->Get_courses();
                         int i = s->Get_coursesize();
-                        cout<<"You have been enrolled to: "<< markcour[i]->Get_name()<<endl;
+                        i--;//cause vector positions are one pos minus
+                        string enrolled =  markcour[i]->Get_name();
+                        cout<<"You have been enrolled to: " <<enrolled <<endl<<endl;
                     }
                     catch(const out_of_range& ex){
                         cout << "Error: could not find the course" << endl<<endl;

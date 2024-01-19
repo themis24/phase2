@@ -4,7 +4,7 @@
 #include <cstring>
 #include <vector>
 #include <list>
-#define MIN_ECTS 240
+#define MIN_ECTS 20
 using namespace std;
 
 class Person{
@@ -135,11 +135,23 @@ class Student: public Person{
         float average;
         int year;
     public:
+        //for simplicity were going to make it mandatory to pass only 4 courses
+        void graduates(){
+            int totalects;
+            for(int i = 0; i < Passed.size(); ++i){
+                if(Passed[i]->Get_mandatory() == 1){
+                    totalects = totalects + Passed[i]->Get_ects();
+                }
+            }
+            if(ects = MIN_ECTS){
+                cout << Get_name() << endl;
+            }
+        }
         void check_passed_stud(const string& mname, int base){ //ask for the origin of the course when cout
             for(int i = 0; i < Passed.size(); ++i){
                 string c = Passed[i]->Get_name();
                 if (c == mname){
-                    cout<<students[i].Get_name() <<" passed the course."<<endl;
+                    cout<<Get_name() <<" passed the course."<<endl;
                     return;  // exit the function after the move
                 }
                 else{
@@ -263,6 +275,11 @@ class Secretary{
         vector<Employee*> employees;
         vector<Semester*> semesters;
     public:
+        void print_graduates(){
+            for(int i = 0 ;i < students.size(); i++ ){
+                students[i]->graduates();
+            }
+        }
         //were in semester[i] whiuch we know the course is in and call this 
         //semester[1].Move_course("Intro", semester[2]);
         void Move_course(const string& mname, int base, int dest){ //ask for the origin of the course when cout
@@ -284,8 +301,8 @@ class Secretary{
             }
         }
         void check_passed_sec(const string& mname, int base){ //ask for the origin of the course when cout
-            for(i = 0 ;i < students.size(); i++ ){
-                students[i].check_passed_stud(mname, base);
+            for(int i = 0 ;i < students.size(); i++ ){
+                students[i]->check_passed_stud(mname, base);
             }
         }
         void remove_course_sec(const string& mname, int base){ //ask for the origin of the course when cout
@@ -618,10 +635,13 @@ void employee(Secretary& secretary){
     cin >> pass;
     cout << endl;
     if(pass == s->Get_password()){
-        cout<<"Press 1 if you want to edit professor related data." << endl << "Press 2 if you want to edit student related data." << endl << "Press 3 if you want to edit semester data." << endl << "Press 4 to logout." << endl;
+        cout<<"Press 1 if you want to edit professor related data." << endl << "Press 2 if you want to edit student related data." << endl << "Press 3 if you want to edit semester data." << endl << "Press 4 if you want to print everyone who can graduate." << endl << "Press 5 to logout." << endl;
         int choice;
         cin >> choice;
-        while(choice != 4){      
+        while(choice != 5){    
+            if(choice == 4){
+                secretary.print_graduates();
+            }  
             if(choice == 1){
                 cout << "Press 1 if you want to add a professor, 2 if you want to edit one, 3 if you want to delete one." << endl;
                 int pchoice;
@@ -878,7 +898,7 @@ void employee(Secretary& secretary){
                     cin>>pchoice;
                 }
             }
-            cout<<"Press 1 if you want to edit professor related data." << endl << "Press 2 if you want to edit student related data." << endl << "Press 3 if you want to edit semester data." << endl << "Press 4 to logout." << endl;
+            cout<<"Press 1 if you want to edit professor related data." << endl << "Press 2 if you want to edit student related data." << endl << "Press 3 if you want to edit semester data." << endl << "Press 4 if you want to print everyone who can graduate." <<endl<< "Press 5 to logout." << endl;
             cin >> choice;
         }
         return;
@@ -1008,13 +1028,21 @@ int main(){
     Professor prof2(nameprof2, idprof2, passwordprof2);
     secretary = secretary + prof2;
     string namecourse = "Intro";
-    int pointcourse = 7;
+    int pointcourse = 5;
     int mandcourse = 1;
     Course intro(prof1,namecourse,pointcourse, mandcourse);
     namecourse = "Datastructs";
-    pointcourse = 7;
+    pointcourse = 5;
     mandcourse = 1;
     Course datastructs(prof2,namecourse, pointcourse, mandcourse);
+    namecourse = "Linear Algebra";
+    pointcourse = 5;
+    mandcourse = 1;
+    Course linear(prof2,namecourse, pointcourse, mandcourse);
+    namecourse = "Physics";
+    pointcourse = 5;
+    mandcourse = 1;
+    Course physics(prof2,namecourse, pointcourse, mandcourse);
     Semester first;
     Semester second;
     string namestud = "Themis";
@@ -1022,17 +1050,24 @@ int main(){
     string passwordstud = "Itriedmybest";
     Employee empl(namestud, idstud, passwordstud);
     Student me(namestud, idstud, passwordstud);
-    me.Set_average(12456789);
+    int g = 10;
+    me.stud_add_passed(intro, g);
+    me.stud_add_passed(linear, g);
+    me.stud_add_passed(datastructs, g);
+    me.stud_add_passed(physics, g);
+    me.Set_average(10);
     me.Set_year(4);
-    me.Set_ects(1111);
+    me.Set_ects(20);
     secretary = secretary + me;
     first.Add_course(intro);
+    first.Add_course(linear);
     secretary = secretary + first;
     cout<<first.size_course()<<endl;
     /*vector<Course*>* tets = first.Get_courses();
     string c = (*tets)[0]->Get_name();
     cout<<c<<endl;*/
     second.Add_course(datastructs);
+    second.Add_course(physics);
     secretary = secretary + second;
     cout << "\n\nMyStudy Menu:\nPress 1 if Student, 2 if Professor, 3 if Secretary." << endl;
     int path;

@@ -135,6 +135,11 @@ class Student: public Person{
         float average;
         int year;
     public:
+        void show_grades(){     //5.8
+            for(int i = 0; i < Passed.size(); ++i){
+                cout<<Passed[i]->Get_name()<< " with grade: "<< Passed_grade[i] << endl;
+            }
+        }
         //for simplicity were going to make it mandatory to pass only 4 courses
         void graduates(){
             int totalects;
@@ -510,10 +515,10 @@ void stud(Secretary &secretary){
     cout << endl;
     if(pass == s->Get_password()){
         cout << "Login successful." << endl<<endl;
-        cout << "Press 1 to show total average."<<endl<<"Press 2 to show your ECTS points."<<endl<<"Press 3 to sign up for a course."<<endl<<"Press 4 to change password."<<endl<<"Press 5 to logout." << endl<<endl;
+        cout << "Press 1 to show total average."<<endl<<"Press 2 to show your ECTS points."<<endl<<"Press 3 to sign up for a course."<<endl<<"Press 4 to change password."<<endl<<"Press 5 to see grades for the passed courses."<<endl<<"Press 6 to logout." << endl<<endl;
         int choice;
         cin >> choice;
-        while(choice != 5){
+        while(choice != 6){
             if(choice == 1){
                 float av = s->Get_average();
                 cout << "Your average is: " << av <<endl<<endl;
@@ -560,7 +565,10 @@ void stud(Secretary &secretary){
                     cout<<"Password changed successfully."<<endl<<endl;
                 }
             }
-            cout << "Press 1 to show total average."<<endl<<"Press 2 to show your ECTS points."<<endl<<"Press 3 to sign up for a course."<<endl<<"Press 4 to change password."<<endl<<"Press 5 to logout." << endl<<endl;
+            else if(choice == 5){
+                s->show_grades();
+            }
+            cout << "Press 1 to show total average."<<endl<<"Press 2 to show your ECTS points."<<endl<<"Press 3 to sign up for a course."<<endl<<"Press 4 to change password."<<endl<<"Press 5 to see grades for passed classes."<<endl<<"Press 6 to logout." << endl<<endl;
             cin >> choice;
             if(choice != 1 & choice != 2 & choice != 3 & choice != 4 & choice != 5 ){
                 break;

@@ -194,9 +194,10 @@ class Semester{
             return courses.size();
         }
         Course* search_name_course(const string& name){
-            for(int i = 0; i < courses.size(); ++i){
+            for(int i = 0; i < courses.size(); i++){
                 Course *temp = courses[i];
                 string c = temp->Get_name();
+                cout<<"IN SEARCH"<<c<<endl;
                 if(c == name){
                     return temp;
                 }
@@ -205,21 +206,26 @@ class Semester{
         }
         /*Semester(const vector<Course>& initialCourses)
         : courses(initialCourses){}*/
-        vector<Course*> Get_courses(){
-            return courses;
+        vector<Course*>* Get_courses(){
+            return &courses;
         }
         
         Semester(){}
-        void Add_course(const Course& newCourse){
+        void Add_course( Course& newCourse){
             Course* temp = new Course(newCourse);
             courses.push_back(temp);
+                cout << "Course added to the semester: " << newCourse.Get_name() << endl;
+    cout << "Number of courses in the semester after adding: " << courses.size() << endl;
+
             return;
         }
         void Remove_course(const string& rmname){
             for(int i = 0; i < courses.size(); ++i){
                 string c = courses[i]->Get_name();
-                if(rmname == c){}
-                delete courses[i];
+                if(rmname == c){
+                    delete courses[i];
+                    courses.erase(courses.begin() + i);
+                }
             }
         }
         //were in semester[i] whiuch we know the course is in and call this 
@@ -267,7 +273,7 @@ class Secretary{
         int sem_size(){
             int total_courses = 0;
             for (const auto& semester : semesters) {
-                total_courses += semester->Get_courses().size();
+                total_courses += semester->size_course();
             }
             return total_courses;
         }
@@ -324,11 +330,11 @@ class Secretary{
         Secretary& Delete_course(const string& name){
             for (auto it1 = semesters.begin(); it1 != semesters.end(); ++it1){
                 Semester* tsem = *it1;
-                for (auto it2 = tsem->Get_courses().begin(); it2 != tsem->Get_courses().end(); ++it2) {
+                for (auto it2 = tsem->Get_courses()->begin(); it2 != tsem->Get_courses()->end(); ++it2) {
                     Course* temp = (*it2);
                     string c = temp->Get_name();
                     if (name == c) { // if the names match, you found the course
-                        it2 = tsem->Get_courses().erase(it2); // Erase the element from the vector
+                        it2 = tsem->Get_courses()->erase(it2); // Erase the element from the vector
                         delete temp; // Delete the course object
                         return *this;
                     }
@@ -471,7 +477,8 @@ void stud(Secretary &secretary){
                     cout << "Enter the course you want to choose: " << endl;
                     string choicec5;
                     cin >> ws;  //skip whitespaces
-                    getline(cin, choicec5);                                                             
+                    getline(cin, choicec5);       
+                    cout << "Entered course name: " << choicec5 << endl;
                     try{
                         Course* modify = checksem->search_name_course(choicec5);
                         cout << "Found course: " << modify->Get_name() << endl;
@@ -891,9 +898,7 @@ int main(){
     mandcourse = 1;
     Course datastructs(prof2,namecourse, pointcourse, mandcourse);
     Semester first;
-    secretary = secretary + first;
     Semester second;
-    secretary = secretary + second;
     string namestud = "Themis";
     string idstud = "sdi2000071";
     string passwordstud = "Itriedmybest";
@@ -904,7 +909,13 @@ int main(){
     me.Set_ects(1111);
     secretary = secretary + me;
     first.Add_course(intro);
+    secretary = secretary + first;
+    cout<<first.size_course()<<endl;
+    /*vector<Course*>* tets = first.Get_courses();
+    string c = (*tets)[0]->Get_name();
+    cout<<c<<endl;*/
     second.Add_course(datastructs);
+    secretary = secretary + second;
     cout << "\n\nMyStudy Menu:\nPress 1 if Student, 2 if Professor, 3 if Secretary." << endl;
     int path;
     cin >> path;
@@ -914,6 +925,10 @@ int main(){
     }
     if(path == 2){
         teach(secretary);
+        return 0;
+    }
+    if(path == 3){
+        employee(secretary);
         return 0;
     }
     return 0;

@@ -1,5 +1,7 @@
-
 #include <iostream>
+#include <iostream>
+#include <fstream>
+#include <sstream>
 #include <string>
 #include <cstring>
 #include <vector>
@@ -453,7 +455,7 @@ class Secretary{
             for(int i = 0; i < professors.size(); i++){
                 Professor *temp = professors[i];
                 string c = temp->Get_id();
-                //cout << "Comparing: " << c << " with " << username << endl;
+                //cout << "Comparing: " << c << " with " << id << endl;
                 if(c == id){
                     return temp;
                 }
@@ -681,7 +683,7 @@ void employee(Secretary& secretary){
                     secretary = secretary + newprof;
                 }
                 else if(pchoice == 2){
-                    cout<< "Press 1 if you want to edit the username or 2 if you want to edit the password" << endl;
+                    cout<< "Press 1 if you want to edit the id or 2 if you want to edit the password" << endl;
                     int edit;
                     cin >> edit;
                     if(edit == 1){
@@ -1023,7 +1025,7 @@ int main(){
         } 
     }
 */
-    string nameprof = "Eleni";
+/*  string nameprof = "Eleni";
     string idprof = "sdiEleni1";
     string passwordprof = "HopeIPass";
     Professor prof1(nameprof, idprof, passwordprof);
@@ -1071,12 +1073,71 @@ int main(){
     first.Add_course(linear);
     secretary = secretary + first;
     cout<<first.size_course()<<endl;
-    /*vector<Course*>* tets = first.Get_courses();
-    string c = (*tets)[0]->Get_name();
-    cout<<c<<endl;*/
     second.Add_course(datastructs);
     second.Add_course(physics);
     secretary = secretary + second;
+*/
+    Semester first;
+    Semester second;            //only two semesters so that we can be more simple
+    ifstream inputFile("profcourses.txt");
+    if (!inputFile.is_open()){
+        cerr << "Error opening file!" << endl;
+        return 0;
+    }
+    string line;
+    while(getline(inputFile, line)){
+        // Use stringstream to extract data from the line
+        stringstream lineStream(line);
+
+        // Variables to store data
+        string name, id, password, course;
+        int semester, ects, mandatory;
+
+        // Extract data from the line
+        lineStream >> name >> id >> password >> semester >> course >> ects >> mandatory;
+        Professor temp(name, id, password);
+        Course tempc(temp, course, ects, mandatory);
+        if(semester == 1){
+            first.Add_course(tempc);
+        }
+        else if(semester == 2){
+            second.Add_course(tempc);
+        }
+        secretary = secretary + temp;
+        // Process the extracted data (you can customize this part)
+    }
+
+    secretary = secretary + first;
+    secretary = secretary + second;
+
+    ifstream inputFile2("studs.txt");
+    if (!inputFile2.is_open()) {
+        cerr << "Error opening file!" << endl;
+        return 0;
+    }
+    while (getline(inputFile2, line)) {
+        // Use stringstream to extract data from the line
+        stringstream lineStream(line);
+        // Variables to store student data
+        string name, id, password;
+        int ects, average, year;
+        // Extract student data from the line
+        lineStream >> name >> id >> password >> ects >> average >> year;
+        Student student(name, id, password, ects, average, year);
+        // Variables for course data
+        int semester;
+        string course;
+        int grade;
+        // Read semester, course, and grade information
+        while (lineStream >> semester >> course >> grade) {
+            Semester* check = secretary.Get_semester(semester);
+            Course* modify = check->search_name_course(course);
+            student.stud_add_passed(*modify, grade);
+        }
+        secretary = secretary + student;
+    }
+    // Close the file
+    inputFile.close();
     cout << "\n\nMyStudy Menu:\nPress 1 if Student, 2 if Professor, 3 if Secretary." << endl;
     int path;
     cin >> path;

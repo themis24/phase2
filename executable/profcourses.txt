@@ -1,4 +1,4 @@
-John sdijohn passjohn 0 DELETED 0 0
+John sdijohn passjohn 1 Intro 5 1
 Mike sdimike passmike 1 Algebra 5 1
 Peter sdipeter passpeter 2 Datastructs 5 1
 Nick sdinick passnick 2 Physics 5 1

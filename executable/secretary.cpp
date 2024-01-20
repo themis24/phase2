@@ -853,11 +853,20 @@ void employee(Secretary& secretary){
                         int man1;
                         cin>>man1;
                         Course newc1(nam1,p1,man1);
-                        checksem->Add_course(newc1);
                         cout<<"Give the professors id"<<endl;
                         string profid;
                         cin>>profid;
-                        
+                        cout<<"Give the professors name"<<endl;
+                        string profname;
+                        cin>>profname;
+                        cout<<"Give the professors password"<<endl;
+                        string profpass;
+                        cin>>profpass;
+                        Professor p(profname,profid,profpass);
+                        p.Set_course(newc1);
+                        newc1.Set_professor(p);
+                        secretary = secretary + p;
+                        checksem->Add_course(newc1);                        
                     }
                     if(pchoice == 2){
                         cout << "Provide the Courses name." << endl;

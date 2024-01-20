@@ -75,6 +75,9 @@ class Professor: public Person{
         Course* current;
         int sem;
     public:
+        void Remove_course(){
+            current = nullptr;
+        }
         void Set_sem(int x){
             sem = x;
         }
@@ -90,9 +93,11 @@ class Professor: public Person{
         }
         Professor(const string& n, const string& id, const string& p)
         :Person(n, id, p){current = nullptr;}
+        Professor(const string& n, const string& id, const string& p, int x)
+        :Person(n, id, p), sem(x) {current = nullptr;}
         Professor(){current = nullptr;}
         Professor(const Professor& copied)
-        :Person(copied){
+        :Person(copied), sem(copied.sem){
             if(copied.current){
                 current = copied.current;
             }
@@ -144,7 +149,7 @@ class Course{
         ~Course(){}
 };
 void Professor::Set_course(const Course& newCourse){
-    Course* current = new Course(newCourse);
+    current = new Course(newCourse);
 }
 class Student: public Person{
     private:
@@ -849,6 +854,10 @@ void employee(Secretary& secretary){
                         cin>>man1;
                         Course newc1(nam1,p1,man1);
                         checksem->Add_course(newc1);
+                        cout<<"Give the professors id"<<endl;
+                        string profid;
+                        cin>>profid;
+                        
                     }
                     if(pchoice == 2){
                         cout << "Provide the Courses name." << endl;
@@ -859,6 +868,17 @@ void employee(Secretary& secretary){
                         cin>>cousem;
                         Semester* checksem = secretary.Get_semester(cousem);
                         Course* modify = checksem->search_name_course(cou);
+                        int flagfound = 0;
+                        Professor* p;
+                        for(int j = 0; j < secretary.professors_size(); j++){//if were editing courses in the semesters we need to also update them in the professors
+                            p = secretary.Get_prof(j);
+                            Course* printcour = p->Get_course();
+                            string cprintname = printcour->Get_name();
+                            if(cprintname == modify->Get_name()){
+                                break;
+                                flagfound = 1;
+                            }
+                        }
                         try{                                                               //prove i can modify a course inside a semester
                             Course* modify = checksem->search_name_course(cou);
                             cout << "Found course: " << modify->Get_name() << endl;
@@ -875,12 +895,14 @@ void employee(Secretary& secretary){
                                 string counewname;
                                 cin>> counewname;
                                 modify->Set_name(counewname);
+                                p->Set_course(*modify);
                             }
                             if(couchoice == 2){
                                 cout<<"Give the new points."<<endl;
                                 int counewects;
                                 cin>> counewects;
                                 modify->Set_ects(counewects);
+                                p->Set_course(*modify);
                             }
                             if(couchoice == 3){     //5.4
                                 cout<<"Give the new professors name."<<endl;
@@ -901,6 +923,8 @@ void employee(Secretary& secretary){
                                 cin>>movesem;
                                 //Semester* checkmovesem = secretary.Get_semester(cousem);
                                 secretary.Move_course(cou, cousem,movesem);
+                                p->Set_course(*modify);
+                                p->Set_sem(movesem);
                             }
                         }
                     }
@@ -911,6 +935,27 @@ void employee(Secretary& secretary){
                         int cousem;
                         cout<<"Provide the Semester its in."<<endl;
                         cin>>cousem;
+                        Semester* checksem = secretary.Get_semester(cousem);
+                        Course* modify = checksem->search_name_course(cou);
+                        int flagfound = 0;
+                        Professor* p;
+                        for(int j = 0; j < secretary.professors_size(); j++){//if were editing courses in the semesters we need to also update them in the professors
+                            p = secretary.Get_prof(j);
+                            Course* printcour = p->Get_course();
+                            string cprintname = printcour->Get_name();
+                            if(cprintname == cou){ 
+                                flagfound = 1;
+                                break;
+                            }
+                        }
+                        if(flagfound){
+                            Course* deleted = new Course();
+                            deleted->Set_name("DELETED");
+                            deleted->Set_ects(0);
+                            p->Set_sem(0);
+                            deleted->Set_mandatory(0);
+                            p->Set_course(*deleted);
+                        }
                         secretary.remove_course_sec(cou, cousem);
                     }
                     if(pchoice == 4){
@@ -948,8 +993,12 @@ void writeProfessorsToFile( Secretary& secretary, const string& filename) {
     for(int j = 0; j < secretary.professors_size(); j++){
         Professor* p = secretary.Get_prof(j);
         Course* printcour = p->Get_course();//its this mfer right here
-    
-        outputFile << p->Get_name() << " " << p->Get_id() << " " << p->Get_password() << " " << p->Get_sem() << " " << printcour->Get_name()<< " " << printcour->Get_ects()<<" "<< printcour->Get_mandatory() << endl;
+        string cprintname = printcour->Get_name();
+        int courects = printcour->Get_ects();
+        int courmand = printcour->Get_mandatory();
+        if(printcour){
+            outputFile << p->Get_name() << " " << p->Get_id() << " " << p->Get_password() << " " << p->Get_sem() << " " << cprintname<< " " << courects<<" "<< courmand<<endl;
+        }
     }
     outputFile.close();
 }
@@ -1142,11 +1191,11 @@ int main(){
         if(semester == 1){
             first.Add_course(tempc);
             temp.Set_course(tempc);
-            temp.Set_sem(1);
+            temp.Set_sem(semester);
         }
         else if(semester == 2){
             temp.Set_course(tempc);
-            temp.Set_sem(2);
+            temp.Set_sem(semester);
             second.Add_course(tempc);
         }
         secretary = secretary + temp;
@@ -1189,13 +1238,13 @@ int main(){
     cin >> path;
     if(path == 1){  //use exception here and on the others
         stud(secretary);
-        //writeProfessorsToFile(secretary, "profcourses.txt");
+        writeProfessorsToFile(secretary, "profcourses.txt");
         //writeStudentsToFile(secretary, "studs.txt");
         return 0;
     }
     if(path == 2){
         teach(secretary);
-        //writeProfessorsToFile(secretary, "profcourses.txt");
+        writeProfessorsToFile(secretary, "profcourses.txt");
         //writeStudentsToFile(secretary, "studs.txt");
         return 0;
     }

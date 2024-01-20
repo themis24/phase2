@@ -148,9 +148,11 @@ class Course{
         {}
         ~Course(){}
 };
+
 void Professor::Set_course(const Course& newCourse){
     current = new Course(newCourse);
 }
+
 class Student: public Person{
     private:
         vector<Course*> Passed;
@@ -519,7 +521,6 @@ class Secretary{
 };
 
 int Person::count = 0;                                      //initialise the count
-
 
 void stud(Secretary &secretary){
     string input;    
@@ -1012,7 +1013,44 @@ void writeProfessorsToFile( Secretary& secretary, const string& filename) {
     outputFile.close();
 }
 
+void writeStudentsToFile( Secretary& secretary, const string& filename) {
+    /*ofstream outputFile(filename);
 
+    if (!outputFile.is_open()) {
+        cerr << "Error opening file for writing: " << filename << endl;
+        return;
+    }
+    cout<<secretary.studs_size()<<endl;
+    // Iterate over professors and write their information to the file
+    for(int j = 0; j < secretary.studs_size(); ++j){
+        cout<<"TEST"<<endl;
+        Student* s = secretary.Get_stud(j);
+        outputFile << s->Get_name() << " " << s->Get_id() << " " << s->Get_password() << " "<< s->Get_ects() << " " << s->Get_average() << " " << s->Get_year();
+        s->printpassed();
+        cout<<"PASSED: "<<s->get_size_passed()<<endl;
+        vector<Course*>* course = s->Get_coursespassed(j);
+        for (int i = 0; i < (*course).size(); ++i){
+            cout<<"IN FILE: "<<(*course)[i]->Get_name()<<endl;
+            outputFile << " " << (*course)[i]->get_sem() << " " << (*course)[i]->Get_name() << " "<< (*course)[i]->get_grade();
+        }
+    }
+    outputFile.close();*/
+    ofstream outputFile(filename);
+
+    if (!outputFile.is_open()) {
+        cerr << "Error opening file for writing: " << filename << endl;
+        return;
+    }
+    cout<<secretary.studs_size()<<endl;
+    // Iterate over professors and write their information to the file
+    for (int j = 0; j < secretary.studs_size(); ++j) {
+        cout << "TEST" << endl;
+        Student* s = secretary.Get_stud(j);
+        outputFile << s->Get_name() << " " << s->Get_id() << " " << s->Get_password() << " " << s->Get_ects() << " " << s->Get_average() << " " << s->Get_year();
+        outputFile << endl;
+    }
+    outputFile.close();
+}
 
 int main(){
     static Secretary secretary;
@@ -1248,19 +1286,19 @@ int main(){
     if(path == 1){  //use exception here and on the others
         stud(secretary);
         writeProfessorsToFile(secretary, "profcourses.txt");
-        //writeStudentsToFile(secretary, "studs.txt");
+        writeStudentsToFile(secretary, "studs.txt");
         return 0;
     }
     if(path == 2){
         teach(secretary);
         writeProfessorsToFile(secretary, "profcourses.txt");
-        //writeStudentsToFile(secretary, "studs.txt");
+        writeStudentsToFile(secretary, "studs.txt");
         return 0;
     }
     if(path == 3){
         employee(secretary);
         writeProfessorsToFile(secretary, "profcourses.txt");
-        //writeStudentsToFile(secretary, "studs.txt");
+        writeStudentsToFile(secretary, "studs.txt");
         return 0;
     }
     return 0;

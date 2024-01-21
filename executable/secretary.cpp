@@ -175,7 +175,7 @@ class Student: public Person{
                     totalects = totalects + Passed[i]->Get_ects();
                 }
             }
-            if(ects = MIN_ECTS){
+            if(totalects = MIN_ECTS){
                 cout << Get_name() << endl;
             }
         }
@@ -186,12 +186,8 @@ class Student: public Person{
                     cout<<Get_name() <<" passed the course."<<endl;
                     return;  // exit the function after the move
                 }
-                else{
-                    // Handle invalid destination semester
-                    cout << "Invalid destination semester.\n";
-                    return;  // exit the function since no valid move is performed
-                }
             }
+            return;
         }
         void stud_add_course(const Course& newCourse){
             Course* temp = new Course(newCourse);
@@ -259,7 +255,7 @@ class Semester{
                     return temp;
                 }
             }
-            throw out_of_range("Course not found");
+            throw out_of_range("Course not found");//error if i dont have this
         }
         /*Semester(const vector<Course>& initialCourses)
         : courses(initialCourses){}*/
@@ -397,6 +393,9 @@ class Secretary{
             }
             for(int i = 0; i < professors.size(); i++){             //dont forget to delete every person inside the list
                 delete professors[i];
+            }
+            for(int i = 0; i < semesters.size(); i++){             //dont forget to delete every person inside the list
+                delete semesters[i];
             }
             //cout << "Destructed the secretary." << endl;
         }
@@ -1014,27 +1013,6 @@ void writeProfessorsToFile( Secretary& secretary, const string& filename) {
 }
 
 void writeStudentsToFile( Secretary& secretary, const string& filename) {
-    /*ofstream outputFile(filename);
-
-    if (!outputFile.is_open()) {
-        cerr << "Error opening file for writing: " << filename << endl;
-        return;
-    }
-    cout<<secretary.studs_size()<<endl;
-    // Iterate over professors and write their information to the file
-    for(int j = 0; j < secretary.studs_size(); ++j){
-        cout<<"TEST"<<endl;
-        Student* s = secretary.Get_stud(j);
-        outputFile << s->Get_name() << " " << s->Get_id() << " " << s->Get_password() << " "<< s->Get_ects() << " " << s->Get_average() << " " << s->Get_year();
-        s->printpassed();
-        cout<<"PASSED: "<<s->get_size_passed()<<endl;
-        vector<Course*>* course = s->Get_coursespassed(j);
-        for (int i = 0; i < (*course).size(); ++i){
-            cout<<"IN FILE: "<<(*course)[i]->Get_name()<<endl;
-            outputFile << " " << (*course)[i]->get_sem() << " " << (*course)[i]->Get_name() << " "<< (*course)[i]->get_grade();
-        }
-    }
-    outputFile.close();*/
     ofstream outputFile(filename);
 
     if (!outputFile.is_open()) {
@@ -1218,8 +1196,8 @@ int main(){
     Semester first;
     Semester second;            //only two semesters so that we can be more simple
     ifstream inputFile("profcourses.txt");
-    if (!inputFile.is_open()){
-        cerr << "Error opening file!" << endl;
+    if(!inputFile.is_open()){
+        cerr << "Error opening file." << endl;
         return 0;
     }
     string line;
@@ -1253,11 +1231,11 @@ int main(){
     secretary = secretary + second;
 
     ifstream inputFile2("studs.txt");
-    if (!inputFile2.is_open()) {
-        cerr << "Error opening file!" << endl;
+    if(!inputFile2.is_open()){
+        cerr << "Error opening file." << endl;
         return 0;
     }
-    while (getline(inputFile2, line)) {
+    while(getline(inputFile2, line)){
         // Use stringstream to extract data from the line
         stringstream lineStream(line);
         // Variables to store student data
@@ -1271,7 +1249,7 @@ int main(){
         string course;
         int grade;
         // Read semester, course, and grade information
-        while (lineStream >> semester >> course >> grade) {
+        while(lineStream >> semester >> course >> grade){
             Semester* check = secretary.Get_semester(semester);
             Course* modify = check->search_name_course(course);
             student.stud_add_passed(*modify, grade);
